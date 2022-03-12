@@ -28,5 +28,6 @@
     "antd": "^4.19.1",
     "react": "^17.0.2",
     "react-use": "^17.3.2"
-  }
+  },
+  "gitHead": "6c07b02f6831c0869cc822d9332bffddfe09f2f8"
 }
