@@ -48,7 +48,6 @@ const cmpValues = (userInput, controllerValue) => {
     return `${userInput || ''}` === `${controllerValue || ''}`;
 };
 
-/** 获取表单字段联动关系信息 */
 export const getMatchController = (
     relationInfoList: FormRelationType[],
     formData: Record<string, any>,
@@ -71,11 +70,6 @@ export const getMatchController = (
         .sort((a, b) => (a.weight || 0) - (b.weight || 0));
 };
 
-/**
- * 某个选项是否被禁用
- * @param props
- * @param relationDetail
- */
 export const optionIsDisabled = (
     props: Record<string, any>,
     relationDetail: FormRelationDetailType,
@@ -88,11 +82,6 @@ export const optionIsDisabled = (
     return props.disabled;
 };
 
-/**
- * 某个选项是否被隐藏
- * @param props
- * @param relationDetail
- */
 export const optionIsHide = (
     props: Record<string, any>,
     relationDetail: FormRelationDetailType,
@@ -105,25 +94,12 @@ export const optionIsHide = (
     return false;
 };
 
-/** 表单是否被禁用 */
 export const isDisabled = (props: Record<string, any>, relationDetail: FormRelationDetailType) => {
     if (relationDetail && relationDetail.disabled !== undefined) {
         return relationDetail.disabled;
     }
     return props.disabled;
 };
-
-/** 表单联动是否发生改变 */
-/* const controllerValueIsChange = (
-    relationInfo: FormRelationType,
-    newFormValues: Record<string, any>,
-    oldFormValues: Record<string, any>,
-) => {
-    return relationInfo.controller.some((item) => {
-        const userInput = newFormValues[item.key as string];
-        return !cmpValues(userInput, oldFormValues[item.key as string]);
-    });
-}; */
 
 export const mergeRelation = (
     prevRelation: Partial<Record<any, FormRelationDetailType>>,
@@ -318,11 +294,6 @@ function FormR<Values = any>({
         const nextMatch = getMatchController(relationInfo, newFormValues, otherFormData);
         const equalMatch = cmpMatch(match, nextMatch);
         let res = { ...prevEffectValues, ...effectValues };
-        /* if (props.className?.includes('ad-app-website-form')) {
-            console.log('initRelationValue', match)
-            console.log('pendingFormValues', pendingFormValues)
-            console.log('effectValues', effectValues)
-        } */
         if (!equalMatch) {
             res = initRelationValue(newFormValues, res);
         }
@@ -341,13 +312,6 @@ function FormR<Values = any>({
             return;
         }
         const newFormValues = initRelationValue(form.getFieldsValue(true), {});
-        /* if (props.className?.includes('ad-budget-schedule-form')) {
-            console.log('pendingFormValues', form.getFieldsValue(true))
-            console.log('newFormValues', newFormValues)
-            console.log('hasChange', Object.keys(newFormValues).some((key) => {
-                return !cmpValues(newFormValues[key], form.getFieldsValue(true)[key]);
-            }))
-        } */
         onChange(newFormValues);
     }, [form.getFieldsValue(true), otherFormData]);
     useMount(() => {
@@ -361,11 +325,6 @@ function FormR<Values = any>({
             ...pendingFormValues,
             ...effectValues,
         };
-        /* if (props.className?.includes('ad-budget-schedule-form')) {
-            console.log('initRelationValue', match)
-            console.log('pendingFormValues', pendingFormValues)
-            console.log('newFormValues', newFormValues)
-        } */
         onChange(newFormValues);
     });
     return (
