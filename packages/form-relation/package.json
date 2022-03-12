@@ -1,0 +1,32 @@
+{
+  "name": "@peng/form-relation",
+  "version": "1.0.0",
+  "description": "> TODO: description",
+  "author": "Peng-YT <1305684595@qq.com>",
+  "homepage": "",
+  "license": "ISC",
+  "main": "lib/index.js",
+  "directories": {
+    "lib": "lib",
+    "test": "__tests__"
+  },
+  "files": [
+    "lib"
+  ],
+  "publishConfig": {
+    "registry": "https://registry.npmjs.org/",
+    "access": "public"
+  },
+  "scripts": {
+    "test": "echo \"Error: run tests from root\" && exit 1",
+    "build": "tsc",
+    "i": "npm i"
+  },
+  "dependencies": {
+    "@types/antd": "^1.0.0",
+    "@types/react": "^17.0.40",
+    "antd": "^4.19.1",
+    "react": "^17.0.2",
+    "react-use": "^17.3.2"
+  }
+}
