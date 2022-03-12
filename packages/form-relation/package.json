@@ -1,6 +1,6 @@
 {
-  "name": "@peng/form-relation",
-  "version": "1.0.1",
+  "name": "@ppeng/form-relation",
+  "version": "1.0.0",
   "description": "> TODO: description",
   "author": "Peng-YT <1305684595@qq.com>",
   "homepage": "",
@@ -29,5 +29,5 @@
     "react": "^17.0.2",
     "react-use": "^17.3.2"
   },
-  "gitHead": "6c07b02f6831c0869cc822d9332bffddfe09f2f8"
+  "gitHead": "f99129b7c7a2d067747d411044dea026a22ca87a"
 }
