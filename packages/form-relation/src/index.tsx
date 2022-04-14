@@ -1,6 +1,6 @@
 /* eslint-disable react-hooks/exhaustive-deps */
 /*
- * @Author: 彭越腾
+ * @Author: @ppeng
  * @Date: 2021-08-16 17:33:33
  * @LastEditTime: 2021-12-29 15:17:33
  * @LastEditors: OBKoro1
@@ -14,7 +14,8 @@ import React, { useContext, createContext, useState } from 'react';
 import Checkbox from './Checkbox';
 import Radio from './Radio';
 import Select from './Select';
-import { useMount, useUpdateEffect } from 'react-use';
+import { useEffect } from 'react';
+import { useRef } from 'react';
 
 const { useForm, List, ErrorList, Provider } = Form;
 
@@ -201,6 +202,7 @@ function FormR<Values = any>({
 }: FormRPropsType<Values> & {
     ref?: React.Ref<FormInstance<Values>> | undefined;
 }) {
+    const isMounted = useRef(false)
     const [form] = useForm(props.form);
     const [oldFormValues, setOldFormValues] = useState<Record<string, any>>({});
     const getHandleValue = (curValue, disableOptions?: string[], excludeDisableOption = true) => {
@@ -349,7 +351,10 @@ function FormR<Values = any>({
             ...effectValues,
         });
     };
-    useUpdateEffect(() => {
+    useEffect(() => {
+        if(!isMounted.current) {
+            return
+        }
         if (!triggerRelation) {
             return;
         }
@@ -363,7 +368,7 @@ function FormR<Values = any>({
         );
         onChange(effectValues);
     }, [form.getFieldsValue(true), otherFormData]);
-    useMount(() => {
+    useEffect(() => {
         const pendingFormValues = form.getFieldsValue(true);
         const match = getMatchController(relationInfo, pendingFormValues, otherFormData);
         const relation: Record<string, FormRelationDetailType> = match.reduce((prev, cur) => {
@@ -375,7 +380,8 @@ function FormR<Values = any>({
             ...effectValues,
         };
         onChange(newFormValues);
-    });
+        isMounted.current = true
+    }, []);
     return (
         <Form<Values> colon={false} form={form} {...props}>
             <FormInstanceContext.Provider value={form}>

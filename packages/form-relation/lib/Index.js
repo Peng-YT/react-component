@@ -1,17 +1,19 @@
 /* eslint-disable react-hooks/exhaustive-deps */
 /*
- * @Author: 彭越腾
+ * @Author: @ppeng
  * @Date: 2021-08-16 17:33:33
  * @LastEditTime: 2021-12-29 15:17:33
  * @LastEditors: OBKoro1
  * @Description: 能控制各个字段之间联动的表单
  */
+/* eslint-disable react-hooks/exhaustive-deps */
 import { Form } from 'antd';
-import React, { useContext, createContext } from 'react';
+import React, { useContext, createContext, useState } from 'react';
 import Checkbox from './Checkbox';
 import Radio from './Radio';
 import Select from './Select';
-import { useMount, useUpdateEffect } from 'react-use';
+import { useEffect } from 'react';
+import { useRef } from 'react';
 const { useForm, List, ErrorList, Provider } = Form;
 export const RelationInfoContext = createContext([]);
 export const FormInstanceContext = createContext(null);
@@ -37,7 +39,6 @@ const cmpValues = (userInput, controllerValue) => {
     }
     return `${userInput || ''}` === `${controllerValue || ''}`;
 };
-/** 获取表单字段联动关系信息 */
 export const getMatchController = (relationInfoList, formData, otherFormData) => {
     return relationInfoList
         .filter((item) => {
@@ -54,11 +55,6 @@ export const getMatchController = (relationInfoList, formData, otherFormData) =>
     })
         .sort((a, b) => (a.weight || 0) - (b.weight || 0));
 };
-/**
- * 某个选项是否被禁用
- * @param props
- * @param relationDetail
- */
 export const optionIsDisabled = (props, relationDetail, optionsValueProp) => {
     const optionValue = optionsValueProp ? props[optionsValueProp] : props.value;
     if (relationDetail && relationDetail.disableOptions) {
@@ -66,11 +62,6 @@ export const optionIsDisabled = (props, relationDetail, optionsValueProp) => {
     }
     return props.disabled;
 };
-/**
- * 某个选项是否被隐藏
- * @param props
- * @param relationDetail
- */
 export const optionIsHide = (props, relationDetail, optionsValueProp) => {
     const optionValue = optionsValueProp ? props[optionsValueProp] : props.value;
     if (relationDetail && relationDetail.hideOptions) {
@@ -78,24 +69,12 @@ export const optionIsHide = (props, relationDetail, optionsValueProp) => {
     }
     return false;
 };
-/** 表单是否被禁用 */
 export const isDisabled = (props, relationDetail) => {
     if (relationDetail && relationDetail.disabled !== undefined) {
         return relationDetail.disabled;
     }
     return props.disabled;
 };
-/** 表单联动是否发生改变 */
-/* const controllerValueIsChange = (
-    relationInfo: FormRelationType,
-    newFormValues: Record<string, any>,
-    oldFormValues: Record<string, any>,
-) => {
-    return relationInfo.controller.some((item) => {
-        const userInput = newFormValues[item.key as string];
-        return !cmpValues(userInput, oldFormValues[item.key as string]);
-    });
-}; */
 export const mergeRelation = (prevRelation, nextRelation) => {
     const newRelation = {};
     Object.keys(prevRelation).forEach((key) => {
@@ -157,7 +136,9 @@ function ItemR({ children, ...props }) {
         }, rules: FormItemIsShow ? props.rules : undefined }, children)) : null));
 }
 function FormR({ onRelationValueChange, relationInfo, children, otherFormData, triggerRelation = true, ...props }) {
+    const isMounted = useRef(false);
     const [form] = useForm(props.form);
+    const [oldFormValues, setOldFormValues] = useState({});
     const getHandleValue = (curValue, disableOptions, excludeDisableOption = true) => {
         if (!excludeDisableOption) {
             return curValue;
@@ -222,10 +203,35 @@ function FormR({ onRelationValueChange, relationInfo, children, otherFormData, t
             return match2.indexOf(item) > -1;
         });
     };
-    const initRelationValue = (pendingFormValues, prevEffectValues) => {
+    const getValueChangeKeys = (prevValues, curValues) => {
+        const allKeys = [...new Set(Object.keys(prevValues).concat(Object.keys(curValues)))];
+        const valueChangeKeys = [];
+        allKeys.forEach((key) => {
+            if (!cmpValues(prevValues[key], curValues[key])) {
+                valueChangeKeys.push(key);
+            }
+        });
+        return valueChangeKeys;
+    };
+    const initRelationValue = (pendingFormValues, prevEffectValues, triggerChangeKeys) => {
         const match = getMatchController(relationInfo, pendingFormValues, otherFormData);
         const relation = match.reduce((prev, cur) => {
-            return mergeRelation(prev, cur.relation);
+            const isTrigger = cur.controller.find((item) => triggerChangeKeys.includes(item.key));
+            let curRelation = {
+                ...cur.relation,
+            };
+            if (isTrigger) {
+                for (const key in curRelation) {
+                    const detail = curRelation[key];
+                    if (detail && hasProp(detail, 'resetValue') && !hasProp(detail, 'value')) {
+                        curRelation[key] = {
+                            ...detail,
+                            value: detail.resetValue,
+                        };
+                    }
+                }
+            }
+            return mergeRelation(prev, curRelation);
         }, {});
         const effectValues = getValuesFromRelation(relation, pendingFormValues);
         const newFormValues = {
@@ -235,39 +241,42 @@ function FormR({ onRelationValueChange, relationInfo, children, otherFormData, t
         const nextMatch = getMatchController(relationInfo, newFormValues, otherFormData);
         const equalMatch = cmpMatch(match, nextMatch);
         let res = { ...prevEffectValues, ...effectValues };
-        /* if (props.className?.includes('ad-app-website-form')) {
-            console.log('initRelationValue', match)
-            console.log('pendingFormValues', pendingFormValues)
-            console.log('effectValues', effectValues)
-        } */
         if (!equalMatch) {
-            res = initRelationValue(newFormValues, res);
+            res = initRelationValue(newFormValues, res, getValueChangeKeys(pendingFormValues, newFormValues));
         }
         return res;
     };
-    const onChange = (newFormValues) => {
-        const valueHasChange = Object.keys(newFormValues).some((key) => {
-            return !cmpValues(newFormValues[key], form.getFieldsValue(true)[key]);
+    const onChange = (effectValues) => {
+        const valueHasChange = Object.keys(effectValues).some((key) => {
+            return !cmpValues(effectValues[key], form.getFieldsValue(true)[key]);
         });
+        /* if (props.className?.includes('ad-launch-form')) {
+            console.log('valueHasChange', valueHasChange);
+            console.log('effectValues', effectValues, form.getFieldsValue(true));
+        } */
         if (valueHasChange) {
-            onRelationValueChange(newFormValues);
+            onRelationValueChange(effectValues);
         }
+        setOldFormValues({
+            ...form.getFieldsValue(true),
+            ...otherFormData,
+            ...effectValues,
+        });
     };
-    useUpdateEffect(() => {
+    useEffect(() => {
+        if (!isMounted.current) {
+            return;
+        }
         if (!triggerRelation) {
             return;
         }
-        const newFormValues = initRelationValue(form.getFieldsValue(true), {});
-        /* if (props.className?.includes('ad-budget-schedule-form')) {
-            console.log('pendingFormValues', form.getFieldsValue(true))
-            console.log('newFormValues', newFormValues)
-            console.log('hasChange', Object.keys(newFormValues).some((key) => {
-                return !cmpValues(newFormValues[key], form.getFieldsValue(true)[key]);
-            }))
-        } */
-        onChange(newFormValues);
+        const effectValues = initRelationValue(form.getFieldsValue(true), {}, getValueChangeKeys(oldFormValues, {
+            ...form.getFieldsValue(true),
+            ...otherFormData,
+        }));
+        onChange(effectValues);
     }, [form.getFieldsValue(true), otherFormData]);
-    useMount(() => {
+    useEffect(() => {
         const pendingFormValues = form.getFieldsValue(true);
         const match = getMatchController(relationInfo, pendingFormValues, otherFormData);
         const relation = match.reduce((prev, cur) => {
@@ -278,13 +287,9 @@ function FormR({ onRelationValueChange, relationInfo, children, otherFormData, t
             ...pendingFormValues,
             ...effectValues,
         };
-        /* if (props.className?.includes('ad-budget-schedule-form')) {
-            console.log('initRelationValue', match)
-            console.log('pendingFormValues', pendingFormValues)
-            console.log('newFormValues', newFormValues)
-        } */
         onChange(newFormValues);
-    });
+        isMounted.current = true;
+    }, []);
     return (React.createElement(Form, { colon: false, form: form, ...props },
         React.createElement(FormInstanceContext.Provider, { value: form },
             React.createElement(RelationInfoContext.Provider, { value: relationInfo },

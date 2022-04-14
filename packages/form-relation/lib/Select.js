@@ -1,5 +1,5 @@
 /*
- * @Author: 彭越腾
+ * @Author: @ppeng
  * @Date: 2021-08-18 17:55:28
  * @LastEditTime: 2022-03-10 14:38:07
  * @LastEditors: Please set LastEditors
@@ -7,7 +7,7 @@
  */
 import { Select } from 'antd';
 import React, { useContext, useMemo } from 'react';
-import { optionIsDisabled, isDisabled, RelationInfoContext, getMatchController, NameContext, FormInstanceContext, mergeRelation, OtherFormDataContext, optionIsHide, TriggerRelationContext, } from '.';
+import { optionIsDisabled, isDisabled, RelationInfoContext, getMatchController, NameContext, FormInstanceContext, mergeRelation, OtherFormDataContext, optionIsHide, TriggerRelationContext, } from './Index';
 import { useRelation } from './hook';
 const { OptGroup, SECRET_COMBOBOX_MODE_DO_NOT_USE } = Select;
 function SelectR({ children, ...props }) {

@@ -10,23 +10,10 @@ export declare const FormInstanceContext: React.Context<FormInstance<any>>;
 export declare const OtherFormDataContext: React.Context<Record<string, any>>;
 export declare const TriggerRelationContext: React.Context<boolean>;
 export declare const NameContext: React.Context<string>;
-/** 获取表单字段联动关系信息 */
 export declare const getMatchController: (relationInfoList: FormRelationType[], formData: Record<string, any>, otherFormData?: Record<string, any> | null) => FormRelationType<any>[];
-/**
- * 某个选项是否被禁用
- * @param props
- * @param relationDetail
- */
 export declare const optionIsDisabled: (props: Record<string, any>, relationDetail: FormRelationDetailType, optionsValueProp?: string) => any;
-/**
- * 某个选项是否被隐藏
- * @param props
- * @param relationDetail
- */
 export declare const optionIsHide: (props: Record<string, any>, relationDetail: FormRelationDetailType, optionsValueProp?: string) => any;
-/** 表单是否被禁用 */
 export declare const isDisabled: (props: Record<string, any>, relationDetail: FormRelationDetailType) => any;
-/** 表单联动是否发生改变 */
 export declare const mergeRelation: (prevRelation: Partial<Record<any, FormRelationDetailType>>, nextRelation: Partial<Record<any, FormRelationDetailType>>) => Partial<Record<string, FormRelationDetailType>>;
 declare function ItemR<Values = any>({ children, ...props }: FormItemProps<Values>): JSX.Element;
 interface FormRPropsType<Values = any> extends FormProps<Values> {
