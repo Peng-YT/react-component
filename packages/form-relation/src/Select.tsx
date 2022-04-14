@@ -21,7 +21,7 @@ import {
     OtherFormDataContext,
     optionIsHide,
     TriggerRelationContext,
-} from '.';
+} from './Index';
 import { useRelation } from './hook';
 
 const { OptGroup, SECRET_COMBOBOX_MODE_DO_NOT_USE } = Select;

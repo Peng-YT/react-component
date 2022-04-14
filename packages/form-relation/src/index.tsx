@@ -6,9 +6,11 @@
  * @LastEditors: OBKoro1
  * @Description: 能控制各个字段之间联动的表单
  */
+/* eslint-disable react-hooks/exhaustive-deps */
+
 import { Form, FormItemProps } from 'antd';
 import type { FormProps, FormInstance } from 'antd';
-import React, { useContext, createContext } from 'react';
+import React, { useContext, createContext, useState } from 'react';
 import Checkbox from './Checkbox';
 import Radio from './Radio';
 import Select from './Select';
@@ -200,6 +202,7 @@ function FormR<Values = any>({
     ref?: React.Ref<FormInstance<Values>> | undefined;
 }) {
     const [form] = useForm(props.form);
+    const [oldFormValues, setOldFormValues] = useState<Record<string, any>>({});
     const getHandleValue = (curValue, disableOptions?: string[], excludeDisableOption = true) => {
         if (!excludeDisableOption) {
             return curValue;
@@ -278,13 +281,39 @@ function FormR<Values = any>({
             return match2.indexOf(item) > -1;
         });
     };
+    const getValueChangeKeys = (prevValues, curValues) => {
+        const allKeys = [...new Set(Object.keys(prevValues).concat(Object.keys(curValues)))];
+        const valueChangeKeys: string[] = [];
+        allKeys.forEach((key) => {
+            if (!cmpValues(prevValues[key], curValues[key])) {
+                valueChangeKeys.push(key);
+            }
+        });
+        return valueChangeKeys;
+    };
     const initRelationValue = (
         pendingFormValues,
         prevEffectValues: Record<string, any>,
+        triggerChangeKeys: any[],
     ): Record<string, any> => {
         const match = getMatchController(relationInfo, pendingFormValues, otherFormData);
         const relation: Record<string, FormRelationDetailType> = match.reduce((prev, cur) => {
-            return mergeRelation(prev, cur.relation);
+            const isTrigger = cur.controller.find((item) => triggerChangeKeys.includes(item.key));
+            let curRelation: FormRelationType<any>['relation'] = {
+                ...cur.relation,
+            };
+            if (isTrigger) {
+                for (const key in curRelation) {
+                    const detail = curRelation[key];
+                    if (detail && hasProp(detail, 'resetValue') && !hasProp(detail, 'value')) {
+                        curRelation[key] = {
+                            ...detail,
+                            value: detail.resetValue,
+                        };
+                    }
+                }
+            }
+            return mergeRelation(prev, curRelation);
         }, {});
         const effectValues = getValuesFromRelation(relation, pendingFormValues);
         const newFormValues = {
@@ -295,24 +324,44 @@ function FormR<Values = any>({
         const equalMatch = cmpMatch(match, nextMatch);
         let res = { ...prevEffectValues, ...effectValues };
         if (!equalMatch) {
-            res = initRelationValue(newFormValues, res);
+            res = initRelationValue(
+                newFormValues,
+                res,
+                getValueChangeKeys(pendingFormValues, newFormValues),
+            );
         }
         return res;
     };
-    const onChange = (newFormValues: Record<string, any>) => {
-        const valueHasChange = Object.keys(newFormValues).some((key) => {
-            return !cmpValues(newFormValues[key], form.getFieldsValue(true)[key]);
+    const onChange = (effectValues: Record<string, any>) => {
+        const valueHasChange = Object.keys(effectValues).some((key) => {
+            return !cmpValues(effectValues[key], form.getFieldsValue(true)[key]);
         });
+        /* if (props.className?.includes('ad-launch-form')) {
+            console.log('valueHasChange', valueHasChange);
+            console.log('effectValues', effectValues, form.getFieldsValue(true));
+        } */
         if (valueHasChange) {
-            onRelationValueChange(newFormValues);
+            onRelationValueChange(effectValues);
         }
+        setOldFormValues({
+            ...form.getFieldsValue(true),
+            ...otherFormData,
+            ...effectValues,
+        });
     };
     useUpdateEffect(() => {
         if (!triggerRelation) {
             return;
         }
-        const newFormValues = initRelationValue(form.getFieldsValue(true), {});
-        onChange(newFormValues);
+        const effectValues = initRelationValue(
+            form.getFieldsValue(true),
+            {},
+            getValueChangeKeys(oldFormValues, {
+                ...form.getFieldsValue(true),
+                ...otherFormData,
+            }),
+        );
+        onChange(effectValues);
     }, [form.getFieldsValue(true), otherFormData]);
     useMount(() => {
         const pendingFormValues = form.getFieldsValue(true);
