@@ -3,7 +3,7 @@
   "version": "1.0.5",
   "description": "> TODO: description",
   "author": "Peng-YT <1305684595@qq.com>",
-  "homepage": "",
+  "homepage": "https://github.com/Peng-YT/react-component/tree/master/packages/form-relation",
   "license": "ISC",
   "main": "lib/index.js",
   "directories": {

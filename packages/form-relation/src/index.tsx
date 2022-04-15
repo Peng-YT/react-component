@@ -204,6 +204,7 @@ function FormR<Values = any>({
 }) {
     const isMounted = useRef(false)
     const [form] = useForm(props.form);
+    const [_, triggerUpdate] = useState(`${+new Date()}`)
     const [oldFormValues, setOldFormValues] = useState<Record<string, any>>({});
     const getHandleValue = (curValue, disableOptions?: string[], excludeDisableOption = true) => {
         if (!excludeDisableOption) {
@@ -383,7 +384,15 @@ function FormR<Values = any>({
         isMounted.current = true
     }, []);
     return (
-        <Form<Values> colon={false} form={form} {...props}>
+        <Form<Values> 
+            colon={false}
+            {...props}
+            form={form} 
+            onValuesChange={(...arg) => {
+                triggerUpdate(`${+new Date()}`)
+                props.onValuesChange(...arg)
+            }}
+        >
             <FormInstanceContext.Provider value={form}>
                 <RelationInfoContext.Provider value={relationInfo}>
                     <OtherFormDataContext.Provider value={otherFormData}>

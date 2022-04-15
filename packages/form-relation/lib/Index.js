@@ -138,6 +138,7 @@ function ItemR({ children, ...props }) {
 function FormR({ onRelationValueChange, relationInfo, children, otherFormData, triggerRelation = true, ...props }) {
     const isMounted = useRef(false);
     const [form] = useForm(props.form);
+    const [_, triggerUpdate] = useState(`${+new Date()}`);
     const [oldFormValues, setOldFormValues] = useState({});
     const getHandleValue = (curValue, disableOptions, excludeDisableOption = true) => {
         if (!excludeDisableOption) {
@@ -290,7 +291,10 @@ function FormR({ onRelationValueChange, relationInfo, children, otherFormData, t
         onChange(newFormValues);
         isMounted.current = true;
     }, []);
-    return (React.createElement(Form, { colon: false, form: form, ...props },
+    return (React.createElement(Form, { colon: false, ...props, form: form, onValuesChange: (...arg) => {
+            triggerUpdate(`${+new Date()}`);
+            props.onValuesChange(...arg);
+        } },
         React.createElement(FormInstanceContext.Provider, { value: form },
             React.createElement(RelationInfoContext.Provider, { value: relationInfo },
                 React.createElement(OtherFormDataContext.Provider, { value: otherFormData },
