@@ -1,6 +1,6 @@
 {
   "name": "@ppeng/resizable-table",
-  "version": "1.0.5",
+  "version": "1.0.6",
   "description": "> TODO: description",
   "author": "Peng-YT <1305684595@qq.com>",
   "homepage": "https://github.com/Peng-YT/react-component/tree/master/packages/resizable-table",
@@ -14,9 +14,9 @@
     "lib"
   ],
   "dependencies": {
-    "react-resizable": "^3.0.4",
     "@types/antd": "^1.0.0",
-    "@types/react": "^17.0.40"
+    "@types/react": "^17.0.40",
+    "react-resizable": "^3.0.4"
   },
   "repository": {
     "type": "git",
