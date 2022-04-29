@@ -1,10 +1,10 @@
 import { Table } from 'antd';
-import React, { useLayoutEffect, useState } from 'react';
+import React, { memo, useLayoutEffect, useState, useCallback } from 'react';
 import { useEffect } from 'react';
 import { useRef } from 'react';
 import { Resizable } from 'react-resizable';
 import 'react-resizable/css/styles.css';
-const ResizableHeaderCell = ({ onWidthChange, title, dataKey, dataWidth, isLatest, xScroll, minWidth = 50, ...props }) => {
+const ResizableHeaderCell = memo(({ onWidthChange, title, dataKey, dataWidth, isLatest, xScroll, minWidth = 50, ...props }) => {
     const thEl = useRef(null);
     const lineEl = useRef(null);
     const [height, setHeight] = useState(0);
@@ -63,17 +63,18 @@ const ResizableHeaderCell = ({ onWidthChange, title, dataKey, dataWidth, isLates
                     display: moveing ? 'block' : 'none',
                     zIndex: 9999999,
                 } }))));
-};
-const BodyCell = ({ dataKey, dataWidth, xScroll, children, ...props }) => {
+});
+const BodyCell = memo(({ dataKey, dataWidth, xScroll, children, ...props }) => {
     return (React.createElement("td", { ...props, style: {
             ...(props.style || {}),
             width: dataWidth,
             maxWidth: xScroll ? dataWidth : undefined,
             minWidth: xScroll ? dataWidth : undefined,
         } }, children));
-};
+});
 function ResizableTable({ components = {}, ...props }) {
-    const [columns, setColumns] = useState([]);
+    const columns = useRef([]);
+    const [_, flesh] = useState(+new Date());
     const getColumnKey = (col) => {
         const dataIndex = col.dataIndex;
         if (Array.isArray(dataIndex)) {
@@ -81,7 +82,7 @@ function ResizableTable({ components = {}, ...props }) {
         }
         return `${dataIndex}`;
     };
-    const handleColumns = (columns) => {
+    const handleColumns = useCallback((columns) => {
         const originColumns = columns || [];
         return originColumns.map((item) => {
             const originOnHeaderCell = item.onHeaderCell;
@@ -114,9 +115,9 @@ function ResizableTable({ components = {}, ...props }) {
                 },
             };
         });
-    };
-    const onWidthChange = (width, key) => {
-        setColumns(handleColumns(columns.map((item) => {
+    }, [props.scroll]);
+    const onWidthChange = useCallback((width, key) => {
+        const handleRes = handleColumns(columns.current.map((item) => {
             if (getColumnKey(item) === key) {
                 return {
                     ...item,
@@ -124,26 +125,30 @@ function ResizableTable({ components = {}, ...props }) {
                 };
             }
             return item;
-        })));
-    };
+        }));
+        columns.current = handleRes;
+        flesh(+new Date());
+    }, [handleColumns]);
+    const headerCellRender = useCallback((cellProps) => {
+        const Cell = components.header?.cell;
+        return (React.createElement(ResizableHeaderCell, { ...cellProps, xScroll: props.scroll?.x === true, onWidthChange: onWidthChange }, Cell ? React.createElement(Cell, { ...cellProps }) : cellProps.children));
+    }, [components.header, props.scroll?.x]);
+    const bodyCellRender = useCallback((cellProps) => {
+        const Cell = components.body?.cell;
+        return (React.createElement(BodyCell, { ...cellProps }, Cell ? React.createElement(Cell, { ...cellProps }) : cellProps.children));
+    }, [components.body]);
     useEffect(() => {
-        setColumns(handleColumns(props.columns || []));
+        columns.current = handleColumns(props.columns || []);
     }, [props.columns]);
-    return (React.createElement(Table, { ...props, columns: columns, components: {
+    return (React.createElement(Table, { ...props, columns: columns.current, components: {
             ...components,
             header: {
                 ...(components.header || {}),
-                cell: (cellProps) => {
-                    const Cell = components.header?.cell;
-                    return (React.createElement(ResizableHeaderCell, { ...cellProps, xScroll: props.scroll?.x === true, onWidthChange: onWidthChange }, Cell ? React.createElement(Cell, { ...cellProps }) : cellProps.children));
-                },
+                cell: headerCellRender,
             },
             body: {
                 ...(components.body || {}),
-                cell: (cellProps) => {
-                    const Cell = components.body?.cell;
-                    return (React.createElement(BodyCell, { ...cellProps }, Cell ? React.createElement(Cell, { ...cellProps }) : cellProps.children));
-                },
+                cell: bodyCellRender,
             },
         } }));
 }
