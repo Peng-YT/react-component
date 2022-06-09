@@ -9,6 +9,7 @@
 import type { TableProps } from 'antd';
 import { Table } from 'antd';
 import { ColumnsType, ColumnType } from 'antd/lib/table';
+import { SorterResult } from 'antd/lib/table/interface';
 import React, { memo, useLayoutEffect, useState, useCallback } from 'react';
 import { useEffect } from 'react';
 import { useRef } from 'react';
@@ -17,6 +18,7 @@ import 'react-resizable/css/styles.css';
 
 interface ResizableHeaderCellPropsType {
     onWidthChange: (width: number, key: string) => any;
+    onDragStart: () => any;
     title?: JSX.Element;
     dataKey: string;
     dataWidth: number;
@@ -29,7 +31,17 @@ interface ResizableHeaderCellPropsType {
 }
 
 const ResizableHeaderCell: React.FC<ResizableHeaderCellPropsType> = memo(
-    ({ onWidthChange, title, dataKey, dataWidth, isLatest, xScroll, minWidth = 50, ...props }) => {
+    ({
+        onWidthChange,
+        onDragStart,
+        title,
+        dataKey,
+        dataWidth,
+        isLatest,
+        xScroll,
+        minWidth = 50,
+        ...props
+    }) => {
         const thEl = useRef<HTMLTableHeaderCellElement>(null);
         const lineEl = useRef<HTMLDivElement>(null);
         const [height, setHeight] = useState(0);
@@ -38,6 +50,7 @@ const ResizableHeaderCell: React.FC<ResizableHeaderCellPropsType> = memo(
         const prevMoveX = useRef(0);
         const originWidth = dataWidth || defaultWidth.current;
         const onResizeStart = () => {
+            onDragStart();
             console.log(dataKey, ':start', originWidth);
             setMoving(true);
         };
@@ -58,7 +71,7 @@ const ResizableHeaderCell: React.FC<ResizableHeaderCellPropsType> = memo(
             setMoving(false);
         };
         useLayoutEffect(() => {
-            const observer = new ResizeObserver((entries) => {
+            const observer = new ResizeObserver(() => {
                 const target = thEl.current as HTMLElement;
                 setHeight(target.clientHeight);
                 defaultWidth.current = target.clientWidth;
@@ -80,6 +93,14 @@ const ResizableHeaderCell: React.FC<ResizableHeaderCellPropsType> = memo(
                 axis="x"
                 width={originWidth || 0}
                 height={height}
+                handle={
+                    <span
+                        onClick={(e) => {
+                            e.stopPropagation();
+                        }}
+                        className="react-resizable-handle react-resizable-handle-se"
+                    ></span>
+                }
             >
                 <th
                     {...props}
@@ -143,33 +164,55 @@ function ResizableTable<RecordType extends object = any>({
     ...props
 }: TableProps<RecordType>) {
     const columns = useRef<ColumnsType<RecordType>>([]);
-    const [_, flesh] = useState(+new Date());
-    const getColumnKey = (col: ColumnType<RecordType>) => {
-        const dataIndex = col.dataIndex;
-        if (Array.isArray(dataIndex)) {
-            return dataIndex.join('->');
+    const [, flesh] = useState(+new Date());
+    const [draging, setDraging] = useState(false);
+    const widthMapRef = useRef<Record<string, any>>({});
+    const setWidthMap = (res: Record<string, any>) => {
+        widthMapRef.current = res;
+        flesh(+new Date());
+    };
+    const sorterOrderMapRef = useRef<Record<string, any>>({});
+    const setSorterOrderMap = (res: Record<string, any>) => {
+        sorterOrderMapRef.current = {
+            ...res,
+        };
+        flesh(+new Date());
+    };
+    const getKeyByDataIndex = (keys) => {
+        if (Array.isArray(keys)) {
+            return keys.join('->');
         }
-        return `${dataIndex}`;
+        return `${keys}`;
+    };
+    const getColumnKey = (col: ColumnType<RecordType>) => {
+        const { dataIndex } = col;
+        return getKeyByDataIndex(dataIndex);
     };
     const handleColumns = useCallback(
-        (columns: ColumnsType<RecordType>) => {
-            const originColumns = columns || [];
+        (prevColumns: ColumnsType<RecordType>) => {
+            const originColumns = prevColumns || [];
             return originColumns.map((item) => {
                 const originOnHeaderCell = item.onHeaderCell;
                 const originOnCell = item.onCell;
+                const width = widthMapRef.current[getColumnKey(item)];
                 return {
                     ...item,
+                    width: width || item.width,
+                    sortOrder:
+                        item.sortOrder === undefined
+                            ? sorterOrderMapRef.current[getColumnKey(item)]
+                            : item.sortOrder,
                     ellipsis: true,
                     onHeaderCell: (column) => {
-                        const idx = originColumns.findIndex((item) => {
-                            return getColumnKey(column) === getColumnKey(item);
+                        const idx = originColumns.findIndex((origin) => {
+                            return getColumnKey(column) === getColumnKey(origin);
                         });
                         const orginCellProps = originOnHeaderCell
                             ? originOnHeaderCell(column, idx)
                             : {};
                         return {
                             ...orginCellProps,
-                            dataWidth: column.width,
+                            dataWidth: width || column.width,
                             dataKey: getColumnKey(column),
                             isLatest: idx === originColumns.length - 1,
                         };
@@ -178,7 +221,7 @@ function ResizableTable<RecordType extends object = any>({
                         const orginCellProps = originOnCell ? originOnCell(column, idx) : {};
                         return {
                             ...orginCellProps,
-                            dataWidth: item.width,
+                            dataWidth: width || column.width,
                             dataKey: getColumnKey(item),
                             xScroll: props.scroll?.x === true,
                         };
@@ -186,10 +229,14 @@ function ResizableTable<RecordType extends object = any>({
                 };
             });
         },
-        [props.scroll],
+        [props.scroll, sorterOrderMapRef.current, widthMapRef.current],
     );
     const onWidthChange = useCallback(
         (width, key) => {
+            setWidthMap({
+                ...widthMapRef.current,
+                [key]: width,
+            });
             const handleRes = handleColumns(
                 columns.current.map((item) => {
                     if (getColumnKey(item) === key) {
@@ -202,10 +249,25 @@ function ResizableTable<RecordType extends object = any>({
                 }),
             );
             columns.current = handleRes;
+            setTimeout(() => {
+                setDraging(false);
+            }, 500);
             flesh(+new Date());
         },
         [handleColumns],
     );
+    const onTableChange = (...arg) => {
+        if (draging) {
+            return false;
+        }
+        const sorter: SorterResult<any> = arg[2];
+        setSorterOrderMap({
+            [getKeyByDataIndex(sorter.field)]: sorter.order,
+        });
+        columns.current = handleColumns(columns.current);
+        flesh(+new Date());
+        return (props.onChange as any)?.(...arg);
+    };
     const headerCellRender = useCallback(
         (cellProps) => {
             const Cell = components.header?.cell;
@@ -214,12 +276,13 @@ function ResizableTable<RecordType extends object = any>({
                     {...cellProps}
                     xScroll={props.scroll?.x === true}
                     onWidthChange={onWidthChange}
+                    onDragStart={() => setDraging(true)}
                 >
                     {Cell ? <Cell {...cellProps}></Cell> : cellProps.children}
                 </ResizableHeaderCell>
             );
         },
-        [components.header, props.scroll?.x],
+        [components.header, props.scroll?.x, onWidthChange],
     );
     const bodyCellRender = useCallback(
         (cellProps) => {
@@ -234,10 +297,12 @@ function ResizableTable<RecordType extends object = any>({
     );
     useEffect(() => {
         columns.current = handleColumns(props.columns || []);
+        flesh(+new Date());
     }, [props.columns]);
     return (
         <Table
             {...props}
+            onChange={onTableChange}
             columns={columns.current}
             components={{
                 ...components,
