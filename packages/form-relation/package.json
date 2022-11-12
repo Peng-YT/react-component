@@ -24,7 +24,8 @@
   },
   "dependencies": {
     "@types/antd": "^1.0.0",
-    "@types/react": "^17.0.40"
+    "@types/react": "^17.0.40",
+    "react-use": "^17.4.0"
   },
   "gitHead": "f99129b7c7a2d067747d411044dea026a22ca87a",
   "types": "./lib/index.d.ts"
