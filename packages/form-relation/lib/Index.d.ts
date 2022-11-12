@@ -18,12 +18,14 @@ export declare const mergeRelation: (prevRelation: Partial<Record<any, FormRelat
 declare function ItemR<Values = any>({ children, ...props }: FormItemProps<Values>): JSX.Element;
 interface FormRPropsType<Values = any> extends FormProps<Values> {
     relationInfo: FormRelationType[];
-    onRelationValueChange: (effect: Record<string, any>) => any;
+    onRelationValueChange: (effect: Record<string, any>, relation: boolean) => any;
+    formData?: Record<string, any>;
     otherFormData?: Record<string, any>;
     /** 是否触发表单联动 */
     triggerRelation?: boolean;
+    triggerResetValue?: boolean;
 }
-declare function FormR<Values = any>({ onRelationValueChange, relationInfo, children, otherFormData, triggerRelation, ...props }: FormRPropsType<Values> & {
+declare function FormR<Values = any>({ onRelationValueChange, relationInfo, children, triggerRelation, triggerResetValue, otherFormData, formData, ...props }: FormRPropsType<Values> & {
     ref?: React.Ref<FormInstance<Values>> | undefined;
 }): JSX.Element;
 declare namespace FormR {
