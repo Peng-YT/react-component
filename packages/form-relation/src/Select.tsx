@@ -76,7 +76,9 @@ function SelectR<VT extends SelectValue = SelectValue>({
     );
 }
 
-const Option: React.FC<OptionProps> = ({ children, ...props }) => {
+const Option: React.FC<OptionProps> & {
+    isSelectOption: boolean;
+} = ({ children, ...props }) => {
     const relation = useRelation(props);
     return relation.optionIsHide ? null : (
         <Select.Option {...props} disabled={relation.optionIsDisabled}>
@@ -86,6 +88,7 @@ const Option: React.FC<OptionProps> = ({ children, ...props }) => {
 };
 
 export { SECRET_COMBOBOX_MODE_DO_NOT_USE, Option, OptGroup };
+Option.isSelectOption = true;
 SelectR.Option = Select.Option;
 SelectR.OptGroup = OptGroup;
 SelectR.SECRET_COMBOBOX_MODE_DO_NOT_USE = SECRET_COMBOBOX_MODE_DO_NOT_USE;
