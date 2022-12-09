@@ -1,5 +1,5 @@
 {
-  "name": "draggable-select",
+  "name": "@ppeng/draggable-select",
   "version": "1.0.0",
   "description": "可动Select框tag值的顺序",
   "author": "Peng-YT <1305684595@qq.com>",
@@ -27,5 +27,5 @@
   "bugs": {
     "url": "https://github.com/Peng-YT/react-component/issues"
   },
-  "gitHead": "06eee431e6ad4995d84fa73a84ebb0c449d4914d"
+  "gitHead": "72aae128927992b4ac7f6013699642aaab408443"
 }
