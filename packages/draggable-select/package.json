@@ -14,7 +14,8 @@
     "lib"
   ],
   "publishConfig": {
-    "registry": "https://npm.efun.com/"
+    "registry": "https://registry.npmjs.org/",
+    "access": "public"
   },
   "repository": {
     "type": "git",
@@ -27,5 +28,5 @@
   "bugs": {
     "url": "https://github.com/Peng-YT/react-component/issues"
   },
-  "gitHead": "0fcdee147c1dea2d4cc3dcaaee7986917813c1c1"
+  "gitHead": "2efec65235ff9cc70559842f9831f5ece98bc7ec"
 }
