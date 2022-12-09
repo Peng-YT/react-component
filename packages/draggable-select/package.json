@@ -1,0 +1,29 @@
+{
+  "name": "draggable-select",
+  "version": "1.0.0",
+  "description": "可动Select框tag值的顺序",
+  "author": "Peng-YT <1305684595@qq.com>",
+  "homepage": "https://github.com/Peng-YT/react-component#readme",
+  "license": "ISC",
+  "main": "lib/index.js",
+  "directories": {
+    "lib": "lib",
+    "test": "__tests__"
+  },
+  "files": [
+    "lib"
+  ],
+  "publishConfig": {
+    "registry": "https://npm.efun.com/"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Peng-YT/react-component.git"
+  },
+  "scripts": {
+    "test": "echo \"Error: run tests from root\" && exit 1"
+  },
+  "bugs": {
+    "url": "https://github.com/Peng-YT/react-component/issues"
+  }
+}
