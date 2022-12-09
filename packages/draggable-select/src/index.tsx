@@ -4,7 +4,7 @@ import type { SelectValue } from 'antd/es/select';
 import { CloseOutlined } from '@ant-design/icons';
 import React, { useEffect, useRef, useState } from 'react';
 
-// 可拖拽调整多选框的顺序
+// 可拖拽调整多选框的顺序--
 const { OptGroup, Option, SECRET_COMBOBOX_MODE_DO_NOT_USE } = Select;
 function DraggableSelect<VT extends SelectValue = SelectValue>({
     children,
