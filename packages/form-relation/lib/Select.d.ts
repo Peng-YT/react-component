@@ -10,6 +10,8 @@ declare namespace SelectR {
     var OptGroup: import("rc-select/lib/OptGroup").OptionGroupFC;
     var SECRET_COMBOBOX_MODE_DO_NOT_USE: string;
 }
-declare const Option: React.FC<OptionProps>;
+declare const Option: React.FC<OptionProps> & {
+    isSelectOption: boolean;
+};
 export { SECRET_COMBOBOX_MODE_DO_NOT_USE, Option, OptGroup };
 export default SelectR;

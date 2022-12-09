@@ -45,6 +45,7 @@ const Option = ({ children, ...props }) => {
     return relation.optionIsHide ? null : (React.createElement(Select.Option, { ...props, disabled: relation.optionIsDisabled }, children));
 };
 export { SECRET_COMBOBOX_MODE_DO_NOT_USE, Option, OptGroup };
+Option.isSelectOption = true;
 SelectR.Option = Select.Option;
 SelectR.OptGroup = OptGroup;
 SelectR.SECRET_COMBOBOX_MODE_DO_NOT_USE = SECRET_COMBOBOX_MODE_DO_NOT_USE;

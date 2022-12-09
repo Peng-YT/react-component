@@ -1,6 +1,6 @@
 {
     "include": ["packages/**/*"],
-    "exclude": ["node_modules", "**/node_modules"],
+    "exclude": ["node_modules", "node_modules/**/*", "../../node_modules"],
     "compilerOptions": {
         "module": "esnext",
         "target": "ES2022",
@@ -9,6 +9,7 @@
         "declaration": true,
         "jsx": "react",
         "resolveJsonModule": false,
-        "moduleResolution": "node"
+        "moduleResolution": "node",
+        "skipLibCheck": true
     }
 }

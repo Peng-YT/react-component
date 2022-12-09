@@ -21,9 +21,11 @@
     "url": "git+https://github.com/Peng-YT/react-component.git"
   },
   "scripts": {
-    "test": "echo \"Error: run tests from root\" && exit 1"
+    "test": "echo \"Error: run tests from root\" && exit 1",
+    "build": "tsc"
   },
   "bugs": {
     "url": "https://github.com/Peng-YT/react-component/issues"
-  }
+  },
+  "gitHead": "2487c8202fb82c79708b0eebaeaeeba35d4d553c"
 }
