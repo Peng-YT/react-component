@@ -178,7 +178,7 @@ function ItemR<Values = any>({ children, ...props }: FormItemProps<Values>) {
                     {...props}
                     style={{
                         ...(props.style || {}),
-                        display: FormItemIsShow ? '' : 'none',
+                        display: FormItemIsShow ? props?.style?.display : 'none',
                     }}
                     rules={FormItemIsShow ? props.rules : undefined}
                 >
