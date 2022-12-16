@@ -136,7 +136,7 @@ function ItemR({ children, ...props }) {
     })();
     return (React.createElement(NameContext.Provider, { value: name }, FormItemIsShow ? (React.createElement(Form.Item, { ...props, style: {
             ...(props.style || {}),
-            display: FormItemIsShow ? '' : 'none',
+            display: FormItemIsShow ? props?.style?.display : 'none',
         }, rules: FormItemIsShow ? props.rules : undefined }, children)) : null));
 }
 function FormR({ onRelationValueChange, relationInfo, children, triggerRelation = true, triggerResetValue = true, otherFormData, formData, ...props }) {
