@@ -45,7 +45,7 @@ function DraggableSelect({ children, ...props }) {
                 dragInfo.current.enterTarget = tagProps.value;
             }, onMouseDown: (e) => {
                 e.stopPropagation();
-            }, onDragEnd: moveTag, draggable: true, onDragOver: (e) => e.preventDefault() }, props.tagRender ? (props.tagRender(tagProps)) : (React.createElement("div", { style: { display: 'flex', alignItems: 'center' } },
+            }, onDragEnd: moveTag, draggable: !disabled, onDragOver: (e) => e.preventDefault() }, props.tagRender ? (props.tagRender(tagProps)) : (React.createElement("div", { style: { display: 'flex', alignItems: 'center' } },
             label,
             closable && !disabled ? (React.createElement(CloseOutlined, { style: {
                     cursor: 'pointer',

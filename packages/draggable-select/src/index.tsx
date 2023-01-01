@@ -64,7 +64,7 @@ function DraggableSelect<VT extends SelectValue = SelectValue>({
                     e.stopPropagation();
                 }}
                 onDragEnd={moveTag}
-                draggable
+                draggable={!disabled}
                 onDragOver={(e) => e.preventDefault()}
             >
                 {props.tagRender ? (
