@@ -12,7 +12,7 @@ import React from 'react';
 import type { CheckboxGroupProps } from 'antd/es/checkbox';
 import { useRelation } from './hook';
 
-const { Group, __ANT_CHECKBOX } = Checkbox;
+const { Group } = Checkbox;
 
 function CheckboxR({ children, ...props }: CheckboxProps & React.RefAttributes<HTMLInputElement>) {
     const { optionIsHide, optionIsDisabled } = useRelation(props);
@@ -37,6 +37,4 @@ const GroupR: React.FC<CheckboxGroupProps & React.RefAttributes<HTMLDivElement>>
 
 export { GroupR as Group };
 CheckboxR.Group = GroupR;
-// eslint-disable-next-line no-underscore-dangle
-CheckboxR.__ANT_CHECKBOX = __ANT_CHECKBOX;
 export default CheckboxR;

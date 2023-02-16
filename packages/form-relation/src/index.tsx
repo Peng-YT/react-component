@@ -10,13 +10,14 @@
 
 import { Form, FormItemProps } from 'antd';
 import type { FormProps, FormInstance } from 'antd';
-import React, { useContext, createContext, useState } from 'react';
+import React, { useContext, createContext, useState, ReactNode } from 'react';
 import Checkbox from './Checkbox';
 import Radio from './Radio';
 import Select from './Select';
 import { useEffect } from 'react';
 import { useRef } from 'react';
 import { useDebounce, useMount } from 'react-use';
+import { FormRelationDetailType, FormRelationType } from '../types/common';
 
 const { useForm, List, ErrorList, Provider } = Form;
 
@@ -443,7 +444,7 @@ function FormR<Values = any>({
                 <RelationInfoContext.Provider value={relationInfo}>
                     <OtherFormDataContext.Provider value={otherFormData}>
                         <TriggerRelationContext.Provider value={triggerRelation}>
-                            {children}
+                            {children as ReactNode}
                         </TriggerRelationContext.Provider>
                     </OtherFormDataContext.Provider>
                 </RelationInfoContext.Provider>

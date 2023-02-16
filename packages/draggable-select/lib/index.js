@@ -1,6 +1,7 @@
 import { Select } from 'antd';
 import { CloseOutlined } from '@ant-design/icons';
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
+
 // 可拖拽调整多选框的顺序--
 const { OptGroup, Option, SECRET_COMBOBOX_MODE_DO_NOT_USE } = Select;
 function DraggableSelect({ children, ...props }) {
@@ -63,8 +64,8 @@ function DraggableSelect({ children, ...props }) {
             props.onChange?.(val, opts);
         }, open: props.open === undefined ? openDropDown : props.open, onBlur: () => setOpenDropDown(false), onMouseDown: () => setOpenDropDown(true) }, children));
 }
-export { SECRET_COMBOBOX_MODE_DO_NOT_USE, Option, OptGroup, DraggableSelect as Select };
 DraggableSelect.Option = Select.Option;
 DraggableSelect.OptGroup = OptGroup;
 DraggableSelect.SECRET_COMBOBOX_MODE_DO_NOT_USE = SECRET_COMBOBOX_MODE_DO_NOT_USE;
-export default DraggableSelect;
+
+export { OptGroup, Option, SECRET_COMBOBOX_MODE_DO_NOT_USE, DraggableSelect as Select, DraggableSelect as default };

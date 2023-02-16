@@ -1,32 +1,44 @@
 {
-  "name": "@ppeng/draggable-select",
-  "version": "1.0.1",
-  "description": "可动Select框tag值的顺序",
-  "author": "Peng-YT <1305684595@qq.com>",
-  "homepage": "https://github.com/Peng-YT/react-component#readme",
-  "license": "ISC",
-  "main": "lib/index.js",
-  "directories": {
-    "lib": "lib",
-    "test": "__tests__"
-  },
-  "files": [
-    "lib"
-  ],
-  "publishConfig": {
-    "registry": "https://registry.npmjs.org/",
-    "access": "public"
-  },
-  "repository": {
-    "type": "git",
-    "url": "git+https://github.com/Peng-YT/react-component.git"
-  },
-  "scripts": {
-    "test": "echo \"Error: run tests from root\" && exit 1",
-    "build": "tsc"
-  },
-  "bugs": {
-    "url": "https://github.com/Peng-YT/react-component/issues"
-  },
-  "gitHead": "2efec65235ff9cc70559842f9831f5ece98bc7ec"
+    "name": "@ppeng/draggable-select",
+    "version": "1.0.1",
+    "description": "可动Select框tag值的顺序",
+    "author": "Peng-YT <1305684595@qq.com>",
+    "homepage": "https://github.com/Peng-YT/react-component#readme",
+    "license": "ISC",
+    "main": "lib/index.js",
+    "type": "module",
+    "buildOpts": {
+        "formats": ["esm"],
+        "entries": ["index.tsx"],
+        "varName": "DraggableSelect"
+    },
+    "directories": {
+        "lib": "lib",
+        "test": "__tests__"
+    },
+    "files": [
+        "lib"
+    ],
+    "publishConfig": {
+        "registry": "https://registry.npmjs.org/",
+        "access": "public"
+    },
+    "repository": {
+        "type": "git",
+        "url": "git+https://github.com/Peng-YT/react-component.git"
+    },
+    "scripts": {
+        "test": "echo \"Error: run tests from root\" && exit 1",
+        "build": "rollup --config ./rollup.config.js"
+    },
+    "bugs": {
+        "url": "https://github.com/Peng-YT/react-component/issues"
+    },
+    "gitHead": "2efec65235ff9cc70559842f9831f5ece98bc7ec",
+    "dependencies": {
+        "@types/antd": "^1.0.0",
+        "@types/react": "^18.0.28",
+        "antd": "^5.2.1",
+        "react": "^18.2.0"
+    }
 }

@@ -28,6 +28,7 @@ interface ResizableHeaderCellPropsType {
     isLatest?: boolean;
     className?: string;
     style?: any;
+    children?: React.ReactNode
 }
 
 const ResizableHeaderCell: React.FC<ResizableHeaderCellPropsType> = memo(
@@ -139,6 +140,7 @@ interface BodyCellPropsType {
     dataWidth: number;
     xScroll: boolean;
     style?: any;
+    children?: React.ReactNode
 }
 
 const BodyCell: React.FC<BodyCellPropsType> = memo(

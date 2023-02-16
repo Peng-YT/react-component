@@ -1,15 +1,31 @@
 {
   "name": "react-component",
   "version": "1.0.0",
-  "description": "",
+  "description": "react组件",
   "main": "index.js",
+  "type": "module",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "build": "node buildScript && lerna run build",
+    "commit": "git add . && git-cz",
+    "publish-001": "npm run commit && lerna version patch --conventional-commits  --no-push && lerna publish",
+    "publish-010": "npm run commit && lerna version minor --conventional-commits  --no-push && lerna publish",
+    "publish-100": "npm run commit && lerna version major --conventional-commits  --no-push && lerna publish"
   },
   "author": "pengyueteng",
   "license": "ISC",
   "devDependencies": {
-    "lerna": "^4.0.0"
+    "@rollup/plugin-commonjs": "^24.0.1",
+    "@rollup/plugin-node-resolve": "^15.0.1",
+    "@types/node": "^18.13.0",
+    "commitizen": "^4.3.0",
+    "conventional-changelog-cli": "^2.2.2",
+    "cz-conventional-changelog": "^3.3.0",
+    "lerna": "^4.0.0",
+    "rimraf": "^4.1.2",
+    "rollup-plugin-typescript2": "^0.34.1",
+    "standard-changelog": "^2.0.27",
+    "ts-node": "^10.9.1"
   },
   "dependencies": {
     "@types/antd": "^1.0.0",
@@ -17,6 +33,13 @@
     "antd": "^4.19.1",
     "react": "latest",
     "react-resizable": "^3.0.4",
-    "react-use": "^17.3.2"
+    "react-use": "^17.3.2",
+    "rollup": "^3.15.0",
+    "rollup-plugin-postcss": "^4.0.2"
+  },
+  "config": {
+    "commitizen": {
+      "path": "cz-conventional-changelog"
+    }
   }
 }

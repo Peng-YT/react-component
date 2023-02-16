@@ -1,4 +1,4 @@
-interface FormRelationType<Keys = any> {
+export interface FormRelationType<Keys = any> {
     matchRule?: 'AND' | 'OR';
     controller: {
         key: keyof Keys;
@@ -9,7 +9,7 @@ interface FormRelationType<Keys = any> {
     weight?: number;
 }
 
-type FormRelationDetailType =
+export type FormRelationDetailType =
     | false
     | {
           disableOptions?: any[];

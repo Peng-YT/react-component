@@ -1,32 +1,43 @@
 {
-  "name": "@ppeng/form-relation",
-  "version": "1.0.9",
-  "description": "> TODO: description",
-  "author": "Peng-YT <1305684595@qq.com>",
-  "homepage": "https://github.com/Peng-YT/react-component/tree/master/packages/form-relation",
-  "license": "ISC",
-  "main": "lib/index.js",
-  "directories": {
-    "lib": "lib",
-    "test": "__tests__"
-  },
-  "files": [
-    "lib"
-  ],
-  "publishConfig": {
-    "registry": "https://registry.npmjs.org/",
-    "access": "public"
-  },
-  "scripts": {
-    "test": "echo \"Error: run tests from root\" && exit 1",
-    "build": "tsc",
-    "i": "npm i"
-  },
-  "dependencies": {
-    "@types/antd": "^1.0.0",
-    "@types/react": "^17.0.40",
-    "react-use": "^17.4.0"
-  },
-  "gitHead": "f99129b7c7a2d067747d411044dea026a22ca87a",
-  "types": "./lib/index.d.ts"
+    "name": "@ppeng/form-relation",
+    "version": "1.0.9",
+    "description": "> TODO: description",
+    "author": "Peng-YT <1305684595@qq.com>",
+    "homepage": "https://github.com/Peng-YT/react-component/tree/master/packages/form-relation",
+    "license": "ISC",
+    "main": "lib/index.js",
+    "directories": {
+        "lib": "lib",
+        "test": "__tests__"
+    },
+    "files": [
+        "lib",
+        "types"
+    ],
+    "buildOpts": {
+        "formats": [
+            "esm"
+        ],
+        "entries": ["index.tsx"],
+        "varName": "FormRelation"
+    },
+    "type": "module",
+    "publishConfig": {
+        "registry": "https://registry.npmjs.org/",
+        "access": "public"
+    },
+    "scripts": {
+        "test": "echo \"Error: run tests from root\" && exit 1",
+        "build": "rollup --config ./rollup.config.js",
+        "i": "npm i"
+    },
+    "dependencies": {
+        "@types/antd": "^1.0.0",
+        "@types/react": "^18.0.28",
+        "antd": "^5.2.1",
+        "react": "^18.2.0",
+        "react-use": "^17.4.0"
+    },
+    "gitHead": "f99129b7c7a2d067747d411044dea026a22ca87a",
+    "types": "./lib/index.d.ts"
 }

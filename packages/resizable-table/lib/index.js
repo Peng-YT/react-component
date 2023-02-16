@@ -1,9 +1,8 @@
 import { Table } from 'antd';
-import React, { memo, useLayoutEffect, useState, useCallback } from 'react';
-import { useEffect } from 'react';
-import { useRef } from 'react';
+import React, { memo, useRef, useState, useLayoutEffect, useCallback, useEffect } from 'react';
 import { Resizable } from 'react-resizable';
 import 'react-resizable/css/styles.css';
+
 const ResizableHeaderCell = memo(({ onWidthChange, onDragStart, title, dataKey, dataWidth, isLatest, xScroll, minWidth = 50, ...props }) => {
     const thEl = useRef(null);
     const lineEl = useRef(null);
@@ -196,4 +195,5 @@ function ResizableTable({ components = {}, ...props }) {
             },
         } }));
 }
+
 export { ResizableTable as Table };
