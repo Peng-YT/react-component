@@ -8,9 +8,9 @@
     "test": "echo \"Error: no test specified\" && exit 1",
     "build": "node buildScript && lerna run build",
     "commit": "git add . && git-cz",
-    "publish-001": "npm run commit && lerna version patch --conventional-commits  --no-push && lerna publish",
-    "publish-010": "npm run commit && lerna version minor --conventional-commits  --no-push && lerna publish",
-    "publish-100": "npm run commit && lerna version major --conventional-commits  --no-push && lerna publish"
+    "publish-001": "npm run commit && lerna version patch --conventional-commits && lerna publish from-git",
+    "publish-010": "npm run commit && lerna version minor --conventional-commits && lerna publish from-git",
+    "publish-100": "npm run commit && lerna version major --conventional-commits && lerna publish from-git"
   },
   "author": "pengyueteng",
   "license": "ISC",
