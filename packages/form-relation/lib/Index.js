@@ -393,7 +393,12 @@ function FormR$1({ onRelationValueChange, relationInfo, children, triggerRelatio
         React.createElement(FormInstanceContext$1.Provider, { value: form },
             React.createElement(RelationInfoContext$1.Provider, { value: relationInfo },
                 React.createElement(OtherFormDataContext$1.Provider, { value: otherFormData },
-                    React.createElement(TriggerRelationContext$1.Provider, { value: triggerRelation }, children))))));
+                    React.createElement(TriggerRelationContext$1.Provider, { value: triggerRelation }, typeof children === 'function' ? children({
+                        form,
+                        relationInfo,
+                        otherFormData,
+                        triggerRelation
+                    }, form) : children))))));
 }
 FormR$1.Item = ItemR$1;
 FormR$1.useForm = useForm$1;
@@ -763,7 +768,12 @@ function FormR({ onRelationValueChange, relationInfo, children, triggerRelation 
         React.createElement(FormInstanceContext.Provider, { value: form },
             React.createElement(RelationInfoContext.Provider, { value: relationInfo },
                 React.createElement(OtherFormDataContext.Provider, { value: otherFormData },
-                    React.createElement(TriggerRelationContext.Provider, { value: triggerRelation }, children))))));
+                    React.createElement(TriggerRelationContext.Provider, { value: triggerRelation }, typeof children === 'function' ? children({
+                        form,
+                        relationInfo,
+                        otherFormData,
+                        triggerRelation
+                    }, form) : children))))));
 }
 FormR.Item = ItemR;
 FormR.useForm = useForm;

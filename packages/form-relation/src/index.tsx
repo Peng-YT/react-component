@@ -444,7 +444,12 @@ function FormR<Values = any>({
                 <RelationInfoContext.Provider value={relationInfo}>
                     <OtherFormDataContext.Provider value={otherFormData}>
                         <TriggerRelationContext.Provider value={triggerRelation}>
-                            {children as ReactNode}
+                            {typeof children === 'function' ? children({
+                                form,
+                                relationInfo,
+                                otherFormData,
+                                triggerRelation
+                            }, form) : children}
                         </TriggerRelationContext.Provider>
                     </OtherFormDataContext.Provider>
                 </RelationInfoContext.Provider>
