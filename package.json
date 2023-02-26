@@ -29,9 +29,9 @@
   },
   "dependencies": {
     "@types/antd": "^1.0.0",
-    "@types/react": "^17.0.40",
+    "@types/react": "^18.0.28",
     "antd": "^4.19.1",
-    "react": "latest",
+    "react": "^18.2.0",
     "react-resizable": "^3.0.4",
     "react-use": "^17.3.2",
     "rollup": "^3.15.0",

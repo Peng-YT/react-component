@@ -5,7 +5,7 @@ import Checkbox from './Checkbox';
 import Radio from './Radio';
 import Select from './Select';
 import { FormRelationDetailType, FormRelationType } from '../types/common';
-declare const useForm: typeof import("antd/es/form/Form").useForm, List: React.FC<import("antd/es/form").FormListProps>, ErrorList: typeof import("antd/es/form/ErrorList").default, Provider: React.FC<import("antd/es/form/context").FormProviderProps>;
+declare const useForm: typeof import("antd/lib/form/Form").useForm, List: React.FC<import("antd/lib/form").FormListProps>, ErrorList: typeof import("antd/lib/form/ErrorList").default, Provider: React.FC<import("antd/lib/form/context").FormProviderProps>;
 export declare const RelationInfoContext: React.Context<FormRelationType<any>[]>;
 export declare const FormInstanceContext: React.Context<FormInstance<any>>;
 export declare const OtherFormDataContext: React.Context<Record<string, any>>;
@@ -31,10 +31,10 @@ declare function FormR<Values = any>({ onRelationValueChange, relationInfo, chil
 }): JSX.Element;
 declare namespace FormR {
     var Item: typeof ItemR;
-    var useForm: typeof import("antd/es/form/Form").useForm;
-    var List: React.FC<import("antd/es/form").FormListProps>;
-    var ErrorList: typeof import("antd/es/form/ErrorList").default;
-    var Provider: React.FC<import("antd/es/form/context").FormProviderProps>;
+    var useForm: typeof import("antd/lib/form/Form").useForm;
+    var List: React.FC<import("antd/lib/form").FormListProps>;
+    var ErrorList: typeof import("antd/lib/form/ErrorList").default;
+    var Provider: React.FC<import("antd/lib/form/context").FormProviderProps>;
 }
 export * from 'antd';
 export { ItemR as Item, useForm, List, ErrorList, Provider, Checkbox, Radio, Select, FormR as Form };
