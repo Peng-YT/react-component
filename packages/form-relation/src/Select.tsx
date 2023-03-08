@@ -51,7 +51,7 @@ function SelectR<VT extends SelectValue = SelectValue>({
     return (
         <Select
             {...props}
-            disabled={triggerRelation ? isDisabled(props, relationDetail) : undefined}
+            disabled={triggerRelation ? isDisabled(props, relationDetail) : props.disabled}
         >
             {(children as any)
                 ?.filter?.((item) => {

@@ -38,8 +38,8 @@ export const useRelation = (props: Record<string, any>) => {
         [matchController, name],
     );
     return {
-        optionIsDisabled: triggerRelation ? optionIsDisabled(props, relationDetail) : undefined,
+        optionIsDisabled: triggerRelation ? optionIsDisabled(props, relationDetail) : props.disabled,
         optionIsHide: triggerRelation ? optionIsHide(props, relationDetail) : undefined,
-        isDisabled: triggerRelation ? isDisabled(props, relationDetail) : undefined,
+        isDisabled: triggerRelation ? isDisabled(props, relationDetail) : props.disabled,
     };
 };

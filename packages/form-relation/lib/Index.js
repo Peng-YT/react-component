@@ -44,7 +44,7 @@ function SelectR({ children, ...props }) {
     const relationDetail = useMemo(() => matchController.reduce((prev, cur) => {
         return mergeRelation$1(prev, cur.relation);
     }, {})[name], [matchController, name]);
-    return (React.createElement(Select, { ...props, disabled: triggerRelation ? isDisabled$1(props, relationDetail) : undefined }, children
+    return (React.createElement(Select, { ...props, disabled: triggerRelation ? isDisabled$1(props, relationDetail) : props.disabled }, children
         ?.filter?.((item) => {
         if (!item) {
             return false;
@@ -133,6 +133,9 @@ const optionIsHide$1 = (props, relationDetail, optionsValueProp) => {
     return false;
 };
 const isDisabled$1 = (props, relationDetail) => {
+    if (props.disabled !== undefined) {
+        return props.disabled;
+    }
     if (relationDetail && relationDetail.disabled !== undefined) {
         return relationDetail.disabled;
     }
@@ -172,6 +175,120 @@ const mergeRelation$1 = (prevRelation, nextRelation) => {
     });
     return newRelation;
 };
+const getHandleValue$1 = (curValue, disableOptions, excludeDisableOption = true) => {
+    if (!excludeDisableOption) {
+        return curValue;
+    }
+    if (!disableOptions || !disableOptions.length) {
+        return curValue;
+    }
+    if (Array.isArray(curValue)) {
+        return curValue.filter((item) => {
+            return !disableOptions.includes(item);
+        });
+    }
+    if (disableOptions.includes(curValue)) {
+        return undefined;
+    }
+    return curValue;
+};
+const getValuesFromRelation$1 = (relation, pendingFormValues) => {
+    return Object.entries(relation).reduce((prev, cur) => {
+        const [key, detail] = cur;
+        const curValue = pendingFormValues[key];
+        let newValue;
+        const curValueUnable = curValue === undefined ||
+            (detail && detail.disableOptions?.includes(curValue)) ||
+            (detail && detail.hideOptions?.includes(curValue)) ||
+            curValue?.some?.((item) => detail && detail.disableOptions?.includes(item)) ||
+            curValue?.some?.((item) => detail && detail.hideOptions?.includes(item));
+        if (curValueUnable &&
+            detail &&
+            hasProp$1(detail, 'resetValue') &&
+            !hasProp$1(detail, 'value')) {
+            newValue = getHandleValue$1(detail.resetValue, [...(detail.disableOptions || []), ...(detail.hideOptions || [])], detail.valueExcludeDisableOption);
+        }
+        else if (detail && hasProp$1(detail, 'value')) {
+            if (typeof detail.value === 'function') {
+                newValue = getHandleValue$1(detail.value(curValue), [...(detail.disableOptions || []), ...(detail.hideOptions || [])], detail.valueExcludeDisableOption);
+            }
+            else {
+                newValue = getHandleValue$1(detail.value, [...(detail.disableOptions || []), ...(detail.hideOptions || [])], detail.valueExcludeDisableOption);
+            }
+        }
+        else if (detail === false) {
+            newValue = undefined;
+        }
+        else {
+            newValue = curValue;
+        }
+        return {
+            ...prev,
+            [key]: newValue,
+        };
+    }, {});
+};
+const cmpMatch$1 = (match1, match2) => {
+    if (match1.length !== match2.length) {
+        return false;
+    }
+    return match1.every((item) => {
+        return match2.indexOf(item) > -1;
+    });
+};
+/** 获取 值发生了变化的key */
+const getValueChangeKeys$1 = (prevValues, curValues) => {
+    const allKeys = [...new Set(Object.keys(prevValues).concat(Object.keys(curValues)))];
+    const valueChangeKeys = [];
+    allKeys.forEach((key) => {
+        if (prevValues[key] !== curValues[key]) {
+            valueChangeKeys.push(key);
+        }
+    });
+    return valueChangeKeys;
+};
+/**
+ * 获取发生联动之后表单的最终值
+ * @param relationInfo 联动关系
+ * @param pendingFormValues 即将要渲染的表单的值
+ * @param prevEffectValues 上一次联动关系计算后得到的 受到了影响的表单的值
+ * @param triggerChangeKeys 触发了此次更新的表单key
+ * @returns 联动计算之后最终的表单值
+ */
+const initRelationValue$1 = (relationInfo, pendingFormValues, prevEffectValues, triggerChangeKeys, needTriggerRest = true) => {
+    const match = getMatchController$1(relationInfo, pendingFormValues);
+    const relation = match.reduce((prev, cur) => {
+        const isTrigger = cur.controller.find((item) => triggerChangeKeys.includes(item.key));
+        const curRelation = {
+            ...cur.relation,
+        };
+        if (isTrigger && needTriggerRest) {
+            // eslint-disable-next-line no-restricted-syntax, guard-for-in
+            for (const key in curRelation) {
+                const detail = curRelation[key];
+                if (detail && hasProp$1(detail, 'resetValue') && !hasProp$1(detail, 'value')) {
+                    curRelation[key] = {
+                        ...detail,
+                        value: detail.resetValue,
+                    };
+                }
+            }
+        }
+        return mergeRelation$1(prev, curRelation);
+    }, {});
+    const effectValues = getValuesFromRelation$1(relation, pendingFormValues);
+    const newFormValues = {
+        ...pendingFormValues,
+        ...effectValues,
+    };
+    const nextMatch = getMatchController$1(relationInfo, newFormValues);
+    const equalMatch = cmpMatch$1(match, nextMatch);
+    let res = { ...prevEffectValues, ...effectValues };
+    if (!equalMatch) {
+        res = initRelationValue$1(relationInfo, newFormValues, res, getValueChangeKeys$1(pendingFormValues, newFormValues), needTriggerRest);
+    }
+    return res;
+};
 function ItemR$1({ children, ...props }) {
     const relationInfo = useContext(RelationInfoContext$1);
     const form = useContext(FormInstanceContext$1);
@@ -209,119 +326,6 @@ function FormR$1({ onRelationValueChange, relationInfo, children, triggerRelatio
         triggerKeys: [],
     });
     const [, triggerUpdate] = useState(`${+new Date()}`);
-    const getHandleValue = (curValue, disableOptions, excludeDisableOption = true) => {
-        if (!excludeDisableOption) {
-            return curValue;
-        }
-        if (!disableOptions || !disableOptions.length) {
-            return curValue;
-        }
-        if (Array.isArray(curValue)) {
-            return curValue.filter((item) => {
-                return !disableOptions.includes(item);
-            });
-        }
-        if (disableOptions.includes(curValue)) {
-            return undefined;
-        }
-        return curValue;
-    };
-    const getValuesFromRelation = (relation, pendingFormValues) => {
-        return Object.entries(relation).reduce((prev, cur) => {
-            const [key, detail] = cur;
-            const curValue = pendingFormValues[key];
-            let newValue;
-            const curValueUnable = curValue === undefined ||
-                (detail && detail.disableOptions?.includes(curValue)) ||
-                (detail && detail.hideOptions?.includes(curValue)) ||
-                curValue?.some?.((item) => detail && detail.disableOptions?.includes(item)) ||
-                curValue?.some?.((item) => detail && detail.hideOptions?.includes(item));
-            if (curValueUnable &&
-                detail &&
-                hasProp$1(detail, 'resetValue') &&
-                !hasProp$1(detail, 'value')) {
-                newValue = getHandleValue(detail.resetValue, [...(detail.disableOptions || []), ...(detail.hideOptions || [])], detail.valueExcludeDisableOption);
-            }
-            else if (detail && hasProp$1(detail, 'value')) {
-                if (typeof detail.value === 'function') {
-                    newValue = getHandleValue(detail.value(curValue), [...(detail.disableOptions || []), ...(detail.hideOptions || [])], detail.valueExcludeDisableOption);
-                }
-                else {
-                    newValue = getHandleValue(detail.value, [...(detail.disableOptions || []), ...(detail.hideOptions || [])], detail.valueExcludeDisableOption);
-                }
-            }
-            else if (detail === false) {
-                newValue = undefined;
-            }
-            else {
-                newValue = curValue;
-            }
-            return {
-                ...prev,
-                [key]: newValue,
-            };
-        }, {});
-    };
-    const cmpMatch = (match1, match2) => {
-        if (match1.length !== match2.length) {
-            return false;
-        }
-        return match1.every((item) => {
-            return match2.indexOf(item) > -1;
-        });
-    };
-    /** 获取 值发生了变化的key */
-    const getValueChangeKeys = (prevValues, curValues) => {
-        const allKeys = [...new Set(Object.keys(prevValues).concat(Object.keys(curValues)))];
-        const valueChangeKeys = [];
-        allKeys.forEach((key) => {
-            if (prevValues[key] !== curValues[key]) {
-                valueChangeKeys.push(key);
-            }
-        });
-        return valueChangeKeys;
-    };
-    /**
-     * 获取发生联动之后表单的最终值
-     * @param pendingFormValues 即将要渲染的表单的值
-     * @param prevEffectValues 上一次联动关系计算后得到的 受到了影响的表单的值
-     * @param triggerChangeKeys 触发了此次更新的表单key
-     * @returns 最总需要渲染的表单值
-     */
-    const initRelationValue = (pendingFormValues, prevEffectValues, triggerChangeKeys, needTriggerRest = true) => {
-        const match = getMatchController$1(relationInfo, pendingFormValues);
-        const relation = match.reduce((prev, cur) => {
-            const isTrigger = cur.controller.find((item) => triggerChangeKeys.includes(item.key));
-            const curRelation = {
-                ...cur.relation,
-            };
-            if (isTrigger && needTriggerRest) {
-                // eslint-disable-next-line no-restricted-syntax, guard-for-in
-                for (const key in curRelation) {
-                    const detail = curRelation[key];
-                    if (detail && hasProp$1(detail, 'resetValue') && !hasProp$1(detail, 'value')) {
-                        curRelation[key] = {
-                            ...detail,
-                            value: detail.resetValue,
-                        };
-                    }
-                }
-            }
-            return mergeRelation$1(prev, curRelation);
-        }, {});
-        const effectValues = getValuesFromRelation(relation, pendingFormValues);
-        const newFormValues = {
-            ...pendingFormValues,
-            ...effectValues,
-        };
-        const nextMatch = getMatchController$1(relationInfo, newFormValues);
-        const equalMatch = cmpMatch(match, nextMatch);
-        let res = { ...prevEffectValues, ...effectValues };
-        if (!equalMatch) {
-            res = initRelationValue(newFormValues, res, getValueChangeKeys(pendingFormValues, newFormValues), needTriggerRest);
-        }
-        return res;
-    };
     const onChange = (effectValues) => {
         const { data } = formDataRef.current;
         const valueHasChange = Object.keys(effectValues).some((key) => {
@@ -340,7 +344,7 @@ function FormR$1({ onRelationValueChange, relationInfo, children, triggerRelatio
         /* if (props.className?.includes('ad-position-form')) {
             console.log(`triggerChangeKeys run`, triggerKeys);
         } */
-        const effectValues = initRelationValue(data, {}, triggerKeys, triggerResetValue);
+        const effectValues = initRelationValue$1(relationInfo, data, {}, triggerKeys, triggerResetValue);
         onChange(effectValues);
     };
     useEffect(() => {
@@ -349,7 +353,7 @@ function FormR$1({ onRelationValueChange, relationInfo, children, triggerRelatio
             ...originFormData,
             ...(otherFormData || {}),
         };
-        const triggerKeys = getValueChangeKeys(oldFormData, formDataRef.current.data);
+        const triggerKeys = getValueChangeKeys$1(oldFormData, formDataRef.current.data);
         formDataRef.current.triggerKeys = triggerKeys;
         /*  if (props.className?.includes('ad-position-form')) {
             console.log(`triggerChangeKeys`, triggerKeys, oldFormData, formDataRef.current.data);
@@ -424,9 +428,9 @@ const useRelation = (props) => {
         return mergeRelation$1(prev, cur.relation);
     }, {})[name], [matchController, name]);
     return {
-        optionIsDisabled: triggerRelation ? optionIsDisabled$1(props, relationDetail) : undefined,
+        optionIsDisabled: triggerRelation ? optionIsDisabled$1(props, relationDetail) : props.disabled,
         optionIsHide: triggerRelation ? optionIsHide$1(props, relationDetail) : undefined,
-        isDisabled: triggerRelation ? isDisabled$1(props, relationDetail) : undefined,
+        isDisabled: triggerRelation ? isDisabled$1(props, relationDetail) : props.disabled,
     };
 };
 
@@ -508,6 +512,9 @@ const optionIsHide = (props, relationDetail, optionsValueProp) => {
     return false;
 };
 const isDisabled = (props, relationDetail) => {
+    if (props.disabled !== undefined) {
+        return props.disabled;
+    }
     if (relationDetail && relationDetail.disabled !== undefined) {
         return relationDetail.disabled;
     }
@@ -547,6 +554,120 @@ const mergeRelation = (prevRelation, nextRelation) => {
     });
     return newRelation;
 };
+const getHandleValue = (curValue, disableOptions, excludeDisableOption = true) => {
+    if (!excludeDisableOption) {
+        return curValue;
+    }
+    if (!disableOptions || !disableOptions.length) {
+        return curValue;
+    }
+    if (Array.isArray(curValue)) {
+        return curValue.filter((item) => {
+            return !disableOptions.includes(item);
+        });
+    }
+    if (disableOptions.includes(curValue)) {
+        return undefined;
+    }
+    return curValue;
+};
+const getValuesFromRelation = (relation, pendingFormValues) => {
+    return Object.entries(relation).reduce((prev, cur) => {
+        const [key, detail] = cur;
+        const curValue = pendingFormValues[key];
+        let newValue;
+        const curValueUnable = curValue === undefined ||
+            (detail && detail.disableOptions?.includes(curValue)) ||
+            (detail && detail.hideOptions?.includes(curValue)) ||
+            curValue?.some?.((item) => detail && detail.disableOptions?.includes(item)) ||
+            curValue?.some?.((item) => detail && detail.hideOptions?.includes(item));
+        if (curValueUnable &&
+            detail &&
+            hasProp(detail, 'resetValue') &&
+            !hasProp(detail, 'value')) {
+            newValue = getHandleValue(detail.resetValue, [...(detail.disableOptions || []), ...(detail.hideOptions || [])], detail.valueExcludeDisableOption);
+        }
+        else if (detail && hasProp(detail, 'value')) {
+            if (typeof detail.value === 'function') {
+                newValue = getHandleValue(detail.value(curValue), [...(detail.disableOptions || []), ...(detail.hideOptions || [])], detail.valueExcludeDisableOption);
+            }
+            else {
+                newValue = getHandleValue(detail.value, [...(detail.disableOptions || []), ...(detail.hideOptions || [])], detail.valueExcludeDisableOption);
+            }
+        }
+        else if (detail === false) {
+            newValue = undefined;
+        }
+        else {
+            newValue = curValue;
+        }
+        return {
+            ...prev,
+            [key]: newValue,
+        };
+    }, {});
+};
+const cmpMatch = (match1, match2) => {
+    if (match1.length !== match2.length) {
+        return false;
+    }
+    return match1.every((item) => {
+        return match2.indexOf(item) > -1;
+    });
+};
+/** 获取 值发生了变化的key */
+const getValueChangeKeys = (prevValues, curValues) => {
+    const allKeys = [...new Set(Object.keys(prevValues).concat(Object.keys(curValues)))];
+    const valueChangeKeys = [];
+    allKeys.forEach((key) => {
+        if (prevValues[key] !== curValues[key]) {
+            valueChangeKeys.push(key);
+        }
+    });
+    return valueChangeKeys;
+};
+/**
+ * 获取发生联动之后表单的最终值
+ * @param relationInfo 联动关系
+ * @param pendingFormValues 即将要渲染的表单的值
+ * @param prevEffectValues 上一次联动关系计算后得到的 受到了影响的表单的值
+ * @param triggerChangeKeys 触发了此次更新的表单key
+ * @returns 联动计算之后最终的表单值
+ */
+const initRelationValue = (relationInfo, pendingFormValues, prevEffectValues, triggerChangeKeys, needTriggerRest = true) => {
+    const match = getMatchController(relationInfo, pendingFormValues);
+    const relation = match.reduce((prev, cur) => {
+        const isTrigger = cur.controller.find((item) => triggerChangeKeys.includes(item.key));
+        const curRelation = {
+            ...cur.relation,
+        };
+        if (isTrigger && needTriggerRest) {
+            // eslint-disable-next-line no-restricted-syntax, guard-for-in
+            for (const key in curRelation) {
+                const detail = curRelation[key];
+                if (detail && hasProp(detail, 'resetValue') && !hasProp(detail, 'value')) {
+                    curRelation[key] = {
+                        ...detail,
+                        value: detail.resetValue,
+                    };
+                }
+            }
+        }
+        return mergeRelation(prev, curRelation);
+    }, {});
+    const effectValues = getValuesFromRelation(relation, pendingFormValues);
+    const newFormValues = {
+        ...pendingFormValues,
+        ...effectValues,
+    };
+    const nextMatch = getMatchController(relationInfo, newFormValues);
+    const equalMatch = cmpMatch(match, nextMatch);
+    let res = { ...prevEffectValues, ...effectValues };
+    if (!equalMatch) {
+        res = initRelationValue(relationInfo, newFormValues, res, getValueChangeKeys(pendingFormValues, newFormValues), needTriggerRest);
+    }
+    return res;
+};
 function ItemR({ children, ...props }) {
     const relationInfo = useContext(RelationInfoContext);
     const form = useContext(FormInstanceContext);
@@ -584,119 +705,6 @@ function FormR({ onRelationValueChange, relationInfo, children, triggerRelation 
         triggerKeys: [],
     });
     const [, triggerUpdate] = useState(`${+new Date()}`);
-    const getHandleValue = (curValue, disableOptions, excludeDisableOption = true) => {
-        if (!excludeDisableOption) {
-            return curValue;
-        }
-        if (!disableOptions || !disableOptions.length) {
-            return curValue;
-        }
-        if (Array.isArray(curValue)) {
-            return curValue.filter((item) => {
-                return !disableOptions.includes(item);
-            });
-        }
-        if (disableOptions.includes(curValue)) {
-            return undefined;
-        }
-        return curValue;
-    };
-    const getValuesFromRelation = (relation, pendingFormValues) => {
-        return Object.entries(relation).reduce((prev, cur) => {
-            const [key, detail] = cur;
-            const curValue = pendingFormValues[key];
-            let newValue;
-            const curValueUnable = curValue === undefined ||
-                (detail && detail.disableOptions?.includes(curValue)) ||
-                (detail && detail.hideOptions?.includes(curValue)) ||
-                curValue?.some?.((item) => detail && detail.disableOptions?.includes(item)) ||
-                curValue?.some?.((item) => detail && detail.hideOptions?.includes(item));
-            if (curValueUnable &&
-                detail &&
-                hasProp(detail, 'resetValue') &&
-                !hasProp(detail, 'value')) {
-                newValue = getHandleValue(detail.resetValue, [...(detail.disableOptions || []), ...(detail.hideOptions || [])], detail.valueExcludeDisableOption);
-            }
-            else if (detail && hasProp(detail, 'value')) {
-                if (typeof detail.value === 'function') {
-                    newValue = getHandleValue(detail.value(curValue), [...(detail.disableOptions || []), ...(detail.hideOptions || [])], detail.valueExcludeDisableOption);
-                }
-                else {
-                    newValue = getHandleValue(detail.value, [...(detail.disableOptions || []), ...(detail.hideOptions || [])], detail.valueExcludeDisableOption);
-                }
-            }
-            else if (detail === false) {
-                newValue = undefined;
-            }
-            else {
-                newValue = curValue;
-            }
-            return {
-                ...prev,
-                [key]: newValue,
-            };
-        }, {});
-    };
-    const cmpMatch = (match1, match2) => {
-        if (match1.length !== match2.length) {
-            return false;
-        }
-        return match1.every((item) => {
-            return match2.indexOf(item) > -1;
-        });
-    };
-    /** 获取 值发生了变化的key */
-    const getValueChangeKeys = (prevValues, curValues) => {
-        const allKeys = [...new Set(Object.keys(prevValues).concat(Object.keys(curValues)))];
-        const valueChangeKeys = [];
-        allKeys.forEach((key) => {
-            if (prevValues[key] !== curValues[key]) {
-                valueChangeKeys.push(key);
-            }
-        });
-        return valueChangeKeys;
-    };
-    /**
-     * 获取发生联动之后表单的最终值
-     * @param pendingFormValues 即将要渲染的表单的值
-     * @param prevEffectValues 上一次联动关系计算后得到的 受到了影响的表单的值
-     * @param triggerChangeKeys 触发了此次更新的表单key
-     * @returns 最总需要渲染的表单值
-     */
-    const initRelationValue = (pendingFormValues, prevEffectValues, triggerChangeKeys, needTriggerRest = true) => {
-        const match = getMatchController(relationInfo, pendingFormValues);
-        const relation = match.reduce((prev, cur) => {
-            const isTrigger = cur.controller.find((item) => triggerChangeKeys.includes(item.key));
-            const curRelation = {
-                ...cur.relation,
-            };
-            if (isTrigger && needTriggerRest) {
-                // eslint-disable-next-line no-restricted-syntax, guard-for-in
-                for (const key in curRelation) {
-                    const detail = curRelation[key];
-                    if (detail && hasProp(detail, 'resetValue') && !hasProp(detail, 'value')) {
-                        curRelation[key] = {
-                            ...detail,
-                            value: detail.resetValue,
-                        };
-                    }
-                }
-            }
-            return mergeRelation(prev, curRelation);
-        }, {});
-        const effectValues = getValuesFromRelation(relation, pendingFormValues);
-        const newFormValues = {
-            ...pendingFormValues,
-            ...effectValues,
-        };
-        const nextMatch = getMatchController(relationInfo, newFormValues);
-        const equalMatch = cmpMatch(match, nextMatch);
-        let res = { ...prevEffectValues, ...effectValues };
-        if (!equalMatch) {
-            res = initRelationValue(newFormValues, res, getValueChangeKeys(pendingFormValues, newFormValues), needTriggerRest);
-        }
-        return res;
-    };
     const onChange = (effectValues) => {
         const { data } = formDataRef.current;
         const valueHasChange = Object.keys(effectValues).some((key) => {
@@ -715,7 +723,7 @@ function FormR({ onRelationValueChange, relationInfo, children, triggerRelation 
         /* if (props.className?.includes('ad-position-form')) {
             console.log(`triggerChangeKeys run`, triggerKeys);
         } */
-        const effectValues = initRelationValue(data, {}, triggerKeys, triggerResetValue);
+        const effectValues = initRelationValue(relationInfo, data, {}, triggerKeys, triggerResetValue);
         onChange(effectValues);
     };
     useEffect(() => {
@@ -781,4 +789,4 @@ FormR.List = List;
 FormR.ErrorList = ErrorList;
 FormR.Provider = Provider;
 
-export { CheckboxR as Checkbox, ErrorList, FormR as Form, FormInstanceContext, ItemR as Item, List, NameContext, OtherFormDataContext, Provider, RadioR as Radio, RelationInfoContext, SelectR as Select, TriggerRelationContext, FormR as default, getMatchController, isDisabled, mergeRelation, optionIsDisabled, optionIsHide, useForm };
+export { CheckboxR as Checkbox, ErrorList, FormR as Form, FormInstanceContext, ItemR as Item, List, NameContext, OtherFormDataContext, Provider, RadioR as Radio, RelationInfoContext, SelectR as Select, TriggerRelationContext, FormR as default, getMatchController, initRelationValue, isDisabled, mergeRelation, optionIsDisabled, optionIsHide, useForm };

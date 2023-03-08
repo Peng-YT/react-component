@@ -16,6 +16,15 @@ export declare const optionIsDisabled: (props: Record<string, any>, relationDeta
 export declare const optionIsHide: (props: Record<string, any>, relationDetail: FormRelationDetailType, optionsValueProp?: string) => any;
 export declare const isDisabled: (props: Record<string, any>, relationDetail: FormRelationDetailType) => any;
 export declare const mergeRelation: (prevRelation: Partial<Record<any, FormRelationDetailType>>, nextRelation: Partial<Record<any, FormRelationDetailType>>) => Partial<Record<string, FormRelationDetailType>>;
+/**
+ * 获取发生联动之后表单的最终值
+ * @param relationInfo 联动关系
+ * @param pendingFormValues 即将要渲染的表单的值
+ * @param prevEffectValues 上一次联动关系计算后得到的 受到了影响的表单的值
+ * @param triggerChangeKeys 触发了此次更新的表单key
+ * @returns 联动计算之后最终的表单值
+ */
+export declare const initRelationValue: (relationInfo: FormRelationType[], pendingFormValues: Record<string, any>, prevEffectValues: Record<string, any>, triggerChangeKeys: any[], needTriggerRest?: boolean) => Record<string, any>;
 declare function ItemR<Values = any>({ children, ...props }: FormItemProps<Values>): JSX.Element;
 interface FormRPropsType<Values = any> extends FormProps<Values> {
     relationInfo: FormRelationType[];
