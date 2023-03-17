@@ -41,5 +41,8 @@
     "commitizen": {
       "path": "cz-conventional-changelog"
     }
+  },
+  "engines": {
+    "node": ">=16.0.0"
   }
 }
