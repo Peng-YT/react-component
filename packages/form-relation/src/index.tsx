@@ -14,12 +14,13 @@ import React, { useContext, createContext, useState, ReactNode } from 'react';
 import Checkbox from './Checkbox';
 import Radio from './Radio';
 import Select from './Select';
+import Switch from './Switch';
 import { useEffect } from 'react';
 import { useRef } from 'react';
 import { useDebounce, useMount } from 'react-use';
 import { FormRelationDetailType, FormRelationType } from '../types/common';
 
-const { useForm, List, ErrorList, Provider } = Form;
+const { useForm } = Form;
 
 export const RelationInfoContext = createContext<FormRelationType[]>([]);
 
@@ -84,6 +85,9 @@ export const optionIsDisabled = (
     relationDetail: FormRelationDetailType,
     optionsValueProp?: string,
 ) => {
+    if(props.disabled !== undefined) {
+        return props.disabled
+    }
     const optionValue = optionsValueProp ? props[optionsValueProp] : props.value;
     if (relationDetail && relationDetail.disableOptions) {
         return relationDetail.disableOptions.includes(optionValue);
@@ -292,8 +296,8 @@ export const initRelationValue = (
     }
     return res;
 };
-
-function ItemR<Values = any>({ children, ...props }: FormItemProps<Values>) {
+type FormItemType = typeof Form.Item
+function ItemComponent<Values = any>({ children, ...props }: FormItemProps<Values>) {
     const relationInfo = useContext(RelationInfoContext);
     const form = useContext(FormInstanceContext);
     const name = (props.name || '') as string;
@@ -335,31 +339,31 @@ function ItemR<Values = any>({ children, ...props }: FormItemProps<Values>) {
         </NameContext.Provider>
     );
 }
-
+const ItemR: typeof ItemComponent & Omit<FormItemType, ''> = Object.assign(ItemComponent, Form.Item)
 interface FormRPropsType<Values = any> extends FormProps<Values> {
     relationInfo: FormRelationType[];
     onRelationValueChange: (effect: Record<string, any>, relation: boolean) => any;
-    formData?: Record<string, any>;
     otherFormData?: Record<string, any>;
     /** 是否触发表单联动 */
     triggerRelation?: boolean;
     triggerResetValue?: boolean;
 }
 
-function FormR<Values = any>({
+type FormType = typeof Form
+
+function FormComponent<Values = any>({
     onRelationValueChange,
     relationInfo,
     children,
     triggerRelation = true,
     triggerResetValue = true,
     otherFormData,
-    formData,
     ...props
 }: FormRPropsType<Values> & {
     ref?: React.Ref<FormInstance<Values>> | undefined;
 }) {
     const [form] = useForm(props.form);
-    const originFormData = formData || form.getFieldsValue(true);
+    const originFormData = form.getFieldsValue(true);
     const formDataRef = useRef<{
         data: Record<string, any>;
         triggerKeys: string[];
@@ -386,9 +390,6 @@ function FormR<Values = any>({
     };
     const run = (triggerKeys: string[]) => {
         const { data } = formDataRef.current;
-        /* if (props.className?.includes('ad-position-form')) {
-            console.log(`triggerChangeKeys run`, triggerKeys);
-        } */
         const effectValues = initRelationValue(relationInfo, data, {}, triggerKeys, triggerResetValue);
         onChange(effectValues);
     };
@@ -400,16 +401,9 @@ function FormR<Values = any>({
         };
         const triggerKeys = getValueChangeKeys(oldFormData, formDataRef.current.data);
         formDataRef.current.triggerKeys = triggerKeys;
-        /*  if (props.className?.includes('ad-position-form')) {
-            console.log(`triggerChangeKeys`, triggerKeys, oldFormData, formDataRef.current.data);
-        } */
     }, [originFormData, otherFormData]);
     useDebounce(
         () => {
-            /* formDataRef.current.data = {
-                ...originFormData,
-                ...(props?.otherFormData || {}),
-            }; */
             if (!triggerRelation) {
                 return;
             }
@@ -419,17 +413,6 @@ function FormR<Values = any>({
         [originFormData, otherFormData],
     );
     useMount(() => {
-        /* const pendingFormValues = originFormData;
-        const match = getMatchController(relationInfo, pendingFormValues, props.otherFormData);
-        const relation: Record<string, FormRelationDetailType> = match.reduce((prev, cur) => {
-            return mergeRelation(prev, cur.relation);
-        }, {});
-        const effectValues = getValuesFromRelation(relation, pendingFormValues);
-        const newFormValues = {
-            ...pendingFormValues,
-            ...effectValues,
-        };
-        onChange(newFormValues); */
         if (!triggerRelation) {
             return;
         }
@@ -465,22 +448,15 @@ function FormR<Values = any>({
         </Form>
     );
 }
-
+const FormR: typeof FormComponent & Omit<FormType, ''> = Object.assign(FormComponent, Form)
 export * from 'antd'
 FormR.Item = ItemR;
-FormR.useForm = useForm;
-FormR.List = List;
-FormR.ErrorList = ErrorList;
-FormR.Provider = Provider;
 export {
     ItemR as Item,
-    useForm,
-    List,
-    ErrorList,
-    Provider,
     Checkbox,
     Radio,
     Select,
+    Switch,
     FormR as Form
 };
 export default FormR;

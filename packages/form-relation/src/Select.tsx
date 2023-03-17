@@ -24,9 +24,7 @@ import {
 } from './Index';
 import { useRelation } from './hook';
 
-const { OptGroup, SECRET_COMBOBOX_MODE_DO_NOT_USE } = Select;
-
-function SelectR<VT extends SelectValue = SelectValue>({
+function SelectComponent<VT extends SelectValue = SelectValue>({
     children,
     ...props
 }: SelectProps<VT> & {
@@ -75,10 +73,8 @@ function SelectR<VT extends SelectValue = SelectValue>({
         </Select>
     );
 }
-
-const Option: React.FC<OptionProps> & {
-    isSelectOption: boolean;
-} = ({ children, ...props }) => {
+const SelectR: typeof Select = Object.assign(SelectComponent, Select)
+const OptionComponent: React.FC<OptionProps> = ({ children, ...props }) => {
     const relation = useRelation(props);
     return relation.optionIsHide ? null : (
         <Select.Option {...props} disabled={relation.optionIsDisabled}>
@@ -86,10 +82,6 @@ const Option: React.FC<OptionProps> & {
         </Select.Option>
     );
 };
-
-export { SECRET_COMBOBOX_MODE_DO_NOT_USE, Option, OptGroup };
-Option.isSelectOption = true;
-SelectR.Option = Select.Option;
-SelectR.OptGroup = OptGroup;
-SelectR.SECRET_COMBOBOX_MODE_DO_NOT_USE = SECRET_COMBOBOX_MODE_DO_NOT_USE;
+const Option: typeof Select.Option = Object.assign(OptionComponent, Select.Option)
+SelectR.Option = Option;
 export default SelectR;

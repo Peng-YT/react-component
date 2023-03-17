@@ -1,4 +1,4 @@
-import { Radio, Select, Form, Checkbox } from 'antd';
+import { Radio, Select, Switch, Form, Checkbox } from 'antd';
 export * from 'antd';
 import React, { useContext, useMemo, createContext, useRef, useState, useEffect } from 'react';
 import { useDebounce, useMount } from 'react-use';
@@ -11,18 +11,21 @@ import { useDebounce, useMount } from 'react-use';
  * @Description: In User Settings Edit
  */
 const { Button, Group: Group$1 } = Radio;
-function RadioR({ children, ...props }) {
+function RadioComponent({ children, ...props }) {
     const { optionIsHide, optionIsDisabled } = useRelation(props);
     return optionIsHide ? ('') : (React.createElement(Radio, { ...props, disabled: optionIsDisabled }, children));
 }
-const GroupR$1 = ({ children, ...props }) => {
+const RadioR = Object.assign(RadioComponent, Radio);
+const GroupComponent$1 = ({ children, ...props }) => {
     const { isDisabled } = useRelation(props);
     return (React.createElement(Group$1, { ...props, disabled: isDisabled }, children));
 };
-function ButtonR({ children, ...props }) {
+const GroupR$1 = Object.assign(GroupComponent$1, Group$1);
+function ButtonComponent({ children, ...props }) {
     const { optionIsHide, optionIsDisabled } = useRelation(props);
     return optionIsHide ? ('') : (React.createElement(Button, { ...props, disabled: optionIsDisabled }, children));
 }
+const ButtonR = Object.assign(ButtonComponent, Button);
 RadioR.Button = ButtonR;
 RadioR.Group = GroupR$1;
 
@@ -33,8 +36,7 @@ RadioR.Group = GroupR$1;
  * @LastEditors: Please set LastEditors
  * @Description: In User Settings Edit
  */
-const { OptGroup, SECRET_COMBOBOX_MODE_DO_NOT_USE } = Select;
-function SelectR({ children, ...props }) {
+function SelectComponent({ children, ...props }) {
     const name = useContext(NameContext$1);
     const relationInfo = useContext(RelationInfoContext$1);
     const form = useContext(FormInstanceContext$1);
@@ -64,17 +66,29 @@ function SelectR({ children, ...props }) {
         },
     }))));
 }
-const Option = ({ children, ...props }) => {
+const SelectR = Object.assign(SelectComponent, Select);
+const OptionComponent = ({ children, ...props }) => {
     const relation = useRelation(props);
     return relation.optionIsHide ? null : (React.createElement(Select.Option, { ...props, disabled: relation.optionIsDisabled }, children));
 };
-Option.isSelectOption = true;
-SelectR.Option = Select.Option;
-SelectR.OptGroup = OptGroup;
-SelectR.SECRET_COMBOBOX_MODE_DO_NOT_USE = SECRET_COMBOBOX_MODE_DO_NOT_USE;
+const Option = Object.assign(OptionComponent, Select.Option);
+SelectR.Option = Option;
+
+/*
+ * @Author: @ppeng
+ * @Date: 2021-08-19 10:34:17
+ * @LastEditTime: 2021-11-26 16:06:48
+ * @LastEditors: Please set LastEditors
+ * @Description: In User Settings Edit
+ */
+const SwitchComponent = (props) => {
+    const { optionIsHide, optionIsDisabled } = useRelation(props);
+    return optionIsHide ? null : (React.createElement(Switch, { ...props, disabled: optionIsDisabled }));
+};
+const SwitchR = Object.assign(SwitchComponent, Switch);
 
 /* eslint-disable react-hooks/exhaustive-deps */
-const { useForm: useForm$1, List: List$1, ErrorList: ErrorList$1, Provider: Provider$1 } = Form;
+const { useForm: useForm$1 } = Form;
 const RelationInfoContext$1 = createContext([]);
 const FormInstanceContext$1 = createContext(null);
 const OtherFormDataContext$1 = createContext(null);
@@ -119,6 +133,9 @@ const getMatchController$1 = (relationInfoList, formData, otherFormData) => {
         .sort((a, b) => (a.weight || 0) - (b.weight || 0));
 };
 const optionIsDisabled$1 = (props, relationDetail, optionsValueProp) => {
+    if (props.disabled !== undefined) {
+        return props.disabled;
+    }
     const optionValue = optionsValueProp ? props[optionsValueProp] : props.value;
     if (relationDetail && relationDetail.disableOptions) {
         return relationDetail.disableOptions.includes(optionValue);
@@ -289,7 +306,7 @@ const initRelationValue$1 = (relationInfo, pendingFormValues, prevEffectValues, 
     }
     return res;
 };
-function ItemR$1({ children, ...props }) {
+function ItemComponent$1({ children, ...props }) {
     const relationInfo = useContext(RelationInfoContext$1);
     const form = useContext(FormInstanceContext$1);
     const name = (props.name || '');
@@ -315,9 +332,10 @@ function ItemR$1({ children, ...props }) {
             display: FormItemIsShow ? props?.style?.display : 'none',
         }, rules: FormItemIsShow ? props.rules : undefined }, children)) : null));
 }
-function FormR$1({ onRelationValueChange, relationInfo, children, triggerRelation = true, triggerResetValue = true, otherFormData, formData, ...props }) {
+const ItemR$1 = Object.assign(ItemComponent$1, Form.Item);
+function FormComponent$1({ onRelationValueChange, relationInfo, children, triggerRelation = true, triggerResetValue = true, otherFormData, ...props }) {
     const [form] = useForm$1(props.form);
-    const originFormData = formData || form.getFieldsValue(true);
+    const originFormData = form.getFieldsValue(true);
     const formDataRef = useRef({
         data: {
             ...originFormData,
@@ -341,9 +359,6 @@ function FormR$1({ onRelationValueChange, relationInfo, children, triggerRelatio
     };
     const run = (triggerKeys) => {
         const { data } = formDataRef.current;
-        /* if (props.className?.includes('ad-position-form')) {
-            console.log(`triggerChangeKeys run`, triggerKeys);
-        } */
         const effectValues = initRelationValue$1(relationInfo, data, {}, triggerKeys, triggerResetValue);
         onChange(effectValues);
     };
@@ -355,32 +370,14 @@ function FormR$1({ onRelationValueChange, relationInfo, children, triggerRelatio
         };
         const triggerKeys = getValueChangeKeys$1(oldFormData, formDataRef.current.data);
         formDataRef.current.triggerKeys = triggerKeys;
-        /*  if (props.className?.includes('ad-position-form')) {
-            console.log(`triggerChangeKeys`, triggerKeys, oldFormData, formDataRef.current.data);
-        } */
     }, [originFormData, otherFormData]);
     useDebounce(() => {
-        /* formDataRef.current.data = {
-            ...originFormData,
-            ...(props?.otherFormData || {}),
-        }; */
         if (!triggerRelation) {
             return;
         }
         run(formDataRef.current.triggerKeys);
     }, 100, [originFormData, otherFormData]);
     useMount(() => {
-        /* const pendingFormValues = originFormData;
-        const match = getMatchController(relationInfo, pendingFormValues, props.otherFormData);
-        const relation: Record<string, FormRelationDetailType> = match.reduce((prev, cur) => {
-            return mergeRelation(prev, cur.relation);
-        }, {});
-        const effectValues = getValuesFromRelation(relation, pendingFormValues);
-        const newFormValues = {
-            ...pendingFormValues,
-            ...effectValues,
-        };
-        onChange(newFormValues); */
         if (!triggerRelation) {
             return;
         }
@@ -404,11 +401,8 @@ function FormR$1({ onRelationValueChange, relationInfo, children, triggerRelatio
                         triggerRelation
                     }, form) : children))))));
 }
+const FormR$1 = Object.assign(FormComponent$1, Form);
 FormR$1.Item = ItemR$1;
-FormR$1.useForm = useForm$1;
-FormR$1.List = List$1;
-FormR$1.ErrorList = ErrorList$1;
-FormR$1.Provider = Provider$1;
 
 /*
  * @Author: your name
@@ -442,18 +436,21 @@ const useRelation = (props) => {
  * @Description: In User Settings Edit
  */
 const { Group } = Checkbox;
-function CheckboxR({ children, ...props }) {
+function CheckboxComponent({ children, ...props }) {
     const { optionIsHide, optionIsDisabled } = useRelation(props);
     return optionIsHide ? null : (React.createElement(Checkbox, { ...props, disabled: optionIsDisabled }, children));
 }
-const GroupR = ({ children, ...props }) => {
+const CheckboxR = Object.assign(CheckboxComponent, Checkbox);
+const GroupComponent = ({ children, ...props }) => {
     const { isDisabled } = useRelation(props);
     return (React.createElement(Group, { ...props, disabled: isDisabled }, children));
 };
+const GroupR = Object.assign(GroupComponent, Group);
 CheckboxR.Group = GroupR;
+var CheckboxR$1 = CheckboxR;
 
 /* eslint-disable react-hooks/exhaustive-deps */
-const { useForm, List, ErrorList, Provider } = Form;
+const { useForm } = Form;
 const RelationInfoContext = createContext([]);
 const FormInstanceContext = createContext(null);
 const OtherFormDataContext = createContext(null);
@@ -498,6 +495,9 @@ const getMatchController = (relationInfoList, formData, otherFormData) => {
         .sort((a, b) => (a.weight || 0) - (b.weight || 0));
 };
 const optionIsDisabled = (props, relationDetail, optionsValueProp) => {
+    if (props.disabled !== undefined) {
+        return props.disabled;
+    }
     const optionValue = optionsValueProp ? props[optionsValueProp] : props.value;
     if (relationDetail && relationDetail.disableOptions) {
         return relationDetail.disableOptions.includes(optionValue);
@@ -668,7 +668,7 @@ const initRelationValue = (relationInfo, pendingFormValues, prevEffectValues, tr
     }
     return res;
 };
-function ItemR({ children, ...props }) {
+function ItemComponent({ children, ...props }) {
     const relationInfo = useContext(RelationInfoContext);
     const form = useContext(FormInstanceContext);
     const name = (props.name || '');
@@ -694,9 +694,10 @@ function ItemR({ children, ...props }) {
             display: FormItemIsShow ? props?.style?.display : 'none',
         }, rules: FormItemIsShow ? props.rules : undefined }, children)) : null));
 }
-function FormR({ onRelationValueChange, relationInfo, children, triggerRelation = true, triggerResetValue = true, otherFormData, formData, ...props }) {
+const ItemR = Object.assign(ItemComponent, Form.Item);
+function FormComponent({ onRelationValueChange, relationInfo, children, triggerRelation = true, triggerResetValue = true, otherFormData, ...props }) {
     const [form] = useForm(props.form);
-    const originFormData = formData || form.getFieldsValue(true);
+    const originFormData = form.getFieldsValue(true);
     const formDataRef = useRef({
         data: {
             ...originFormData,
@@ -720,9 +721,6 @@ function FormR({ onRelationValueChange, relationInfo, children, triggerRelation 
     };
     const run = (triggerKeys) => {
         const { data } = formDataRef.current;
-        /* if (props.className?.includes('ad-position-form')) {
-            console.log(`triggerChangeKeys run`, triggerKeys);
-        } */
         const effectValues = initRelationValue(relationInfo, data, {}, triggerKeys, triggerResetValue);
         onChange(effectValues);
     };
@@ -734,32 +732,14 @@ function FormR({ onRelationValueChange, relationInfo, children, triggerRelation 
         };
         const triggerKeys = getValueChangeKeys(oldFormData, formDataRef.current.data);
         formDataRef.current.triggerKeys = triggerKeys;
-        /*  if (props.className?.includes('ad-position-form')) {
-            console.log(`triggerChangeKeys`, triggerKeys, oldFormData, formDataRef.current.data);
-        } */
     }, [originFormData, otherFormData]);
     useDebounce(() => {
-        /* formDataRef.current.data = {
-            ...originFormData,
-            ...(props?.otherFormData || {}),
-        }; */
         if (!triggerRelation) {
             return;
         }
         run(formDataRef.current.triggerKeys);
     }, 100, [originFormData, otherFormData]);
     useMount(() => {
-        /* const pendingFormValues = originFormData;
-        const match = getMatchController(relationInfo, pendingFormValues, props.otherFormData);
-        const relation: Record<string, FormRelationDetailType> = match.reduce((prev, cur) => {
-            return mergeRelation(prev, cur.relation);
-        }, {});
-        const effectValues = getValuesFromRelation(relation, pendingFormValues);
-        const newFormValues = {
-            ...pendingFormValues,
-            ...effectValues,
-        };
-        onChange(newFormValues); */
         if (!triggerRelation) {
             return;
         }
@@ -783,10 +763,7 @@ function FormR({ onRelationValueChange, relationInfo, children, triggerRelation 
                         triggerRelation
                     }, form) : children))))));
 }
+const FormR = Object.assign(FormComponent, Form);
 FormR.Item = ItemR;
-FormR.useForm = useForm;
-FormR.List = List;
-FormR.ErrorList = ErrorList;
-FormR.Provider = Provider;
 
-export { CheckboxR as Checkbox, ErrorList, FormR as Form, FormInstanceContext, ItemR as Item, List, NameContext, OtherFormDataContext, Provider, RadioR as Radio, RelationInfoContext, SelectR as Select, TriggerRelationContext, FormR as default, getMatchController, initRelationValue, isDisabled, mergeRelation, optionIsDisabled, optionIsHide, useForm };
+export { CheckboxR$1 as Checkbox, FormR as Form, FormInstanceContext, ItemR as Item, NameContext, OtherFormDataContext, RadioR as Radio, RelationInfoContext, SelectR as Select, SwitchR as Switch, TriggerRelationContext, FormR as default, getMatchController, initRelationValue, isDisabled, mergeRelation, optionIsDisabled, optionIsHide };

@@ -13,7 +13,7 @@ import { useRelation } from './hook';
 
 const { Button, Group } = Radio;
 
-function RadioR({ children, ...props }: RadioProps & React.RefAttributes<HTMLElement>) {
+function RadioComponent({ children, ...props }: RadioProps & React.RefAttributes<HTMLElement>) {
     const { optionIsHide, optionIsDisabled } = useRelation(props);
     return optionIsHide ? (
         ''
@@ -23,8 +23,9 @@ function RadioR({ children, ...props }: RadioProps & React.RefAttributes<HTMLEle
         </Radio>
     );
 }
+const RadioR: typeof Radio = Object.assign(RadioComponent, Radio)
 
-const GroupR: React.FC<RadioGroupProps & React.RefAttributes<HTMLDivElement>> = ({
+const GroupComponent: React.FC<RadioGroupProps & React.RefAttributes<HTMLDivElement>> = ({
     children,
     ...props
 }) => {
@@ -35,8 +36,8 @@ const GroupR: React.FC<RadioGroupProps & React.RefAttributes<HTMLDivElement>> = 
         </Group>
     );
 };
-
-function ButtonR({ children, ...props }: RadioButtonProps & React.RefAttributes<any>) {
+const GroupR: typeof Group = Object.assign(GroupComponent, Group)
+function ButtonComponent({ children, ...props }: RadioButtonProps & React.RefAttributes<any>) {
     const { optionIsHide, optionIsDisabled } = useRelation(props);
     return optionIsHide ? (
         ''
@@ -46,8 +47,7 @@ function ButtonR({ children, ...props }: RadioButtonProps & React.RefAttributes<
         </Button>
     );
 }
-
-export { GroupR as Group, ButtonR as Button };
+const ButtonR: typeof Button = Object.assign(ButtonComponent, Button)
 RadioR.Button = ButtonR;
 RadioR.Group = GroupR;
 export default RadioR;

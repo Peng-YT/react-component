@@ -1,11 +1,11 @@
-import { FormItemProps } from 'antd';
+import { Form, FormItemProps } from 'antd';
 import type { FormProps, FormInstance } from 'antd';
 import React from 'react';
 import Checkbox from './Checkbox';
 import Radio from './Radio';
 import Select from './Select';
+import Switch from './Switch';
 import { FormRelationDetailType, FormRelationType } from '../types/common';
-declare const useForm: typeof import("antd/lib/form/Form").useForm, List: React.FC<import("antd/lib/form").FormListProps>, ErrorList: typeof import("antd/lib/form/ErrorList").default, Provider: React.FC<import("antd/lib/form/context").FormProviderProps>;
 export declare const RelationInfoContext: React.Context<FormRelationType<any>[]>;
 export declare const FormInstanceContext: React.Context<FormInstance<any>>;
 export declare const OtherFormDataContext: React.Context<Record<string, any>>;
@@ -25,26 +25,22 @@ export declare const mergeRelation: (prevRelation: Partial<Record<any, FormRelat
  * @returns 联动计算之后最终的表单值
  */
 export declare const initRelationValue: (relationInfo: FormRelationType[], pendingFormValues: Record<string, any>, prevEffectValues: Record<string, any>, triggerChangeKeys: any[], needTriggerRest?: boolean) => Record<string, any>;
-declare function ItemR<Values = any>({ children, ...props }: FormItemProps<Values>): JSX.Element;
+type FormItemType = typeof Form.Item;
+declare function ItemComponent<Values = any>({ children, ...props }: FormItemProps<Values>): JSX.Element;
+declare const ItemR: typeof ItemComponent & Omit<FormItemType, ''>;
 interface FormRPropsType<Values = any> extends FormProps<Values> {
     relationInfo: FormRelationType[];
     onRelationValueChange: (effect: Record<string, any>, relation: boolean) => any;
-    formData?: Record<string, any>;
     otherFormData?: Record<string, any>;
     /** 是否触发表单联动 */
     triggerRelation?: boolean;
     triggerResetValue?: boolean;
 }
-declare function FormR<Values = any>({ onRelationValueChange, relationInfo, children, triggerRelation, triggerResetValue, otherFormData, formData, ...props }: FormRPropsType<Values> & {
+type FormType = typeof Form;
+declare function FormComponent<Values = any>({ onRelationValueChange, relationInfo, children, triggerRelation, triggerResetValue, otherFormData, ...props }: FormRPropsType<Values> & {
     ref?: React.Ref<FormInstance<Values>> | undefined;
 }): JSX.Element;
-declare namespace FormR {
-    var Item: typeof ItemR;
-    var useForm: typeof import("antd/lib/form/Form").useForm;
-    var List: React.FC<import("antd/lib/form").FormListProps>;
-    var ErrorList: typeof import("antd/lib/form/ErrorList").default;
-    var Provider: React.FC<import("antd/lib/form/context").FormProviderProps>;
-}
+declare const FormR: typeof FormComponent & Omit<FormType, ''>;
 export * from 'antd';
-export { ItemR as Item, useForm, List, ErrorList, Provider, Checkbox, Radio, Select, FormR as Form };
+export { ItemR as Item, Checkbox, Radio, Select, Switch, FormR as Form };
 export default FormR;

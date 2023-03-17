@@ -14,7 +14,7 @@ import { useRelation } from './hook';
 
 const { Group } = Checkbox;
 
-function CheckboxR({ children, ...props }: CheckboxProps & React.RefAttributes<HTMLInputElement>) {
+function CheckboxComponent({ children, ...props }: CheckboxProps & React.RefAttributes<HTMLInputElement>) {
     const { optionIsHide, optionIsDisabled } = useRelation(props);
     return optionIsHide ? null : (
         <Checkbox {...props} disabled={optionIsDisabled}>
@@ -22,8 +22,8 @@ function CheckboxR({ children, ...props }: CheckboxProps & React.RefAttributes<H
         </Checkbox>
     );
 }
-
-const GroupR: React.FC<CheckboxGroupProps & React.RefAttributes<HTMLDivElement>> = ({
+const CheckboxR: typeof Checkbox = Object.assign(CheckboxComponent, Checkbox)
+const GroupComponent: React.FC<CheckboxGroupProps & React.RefAttributes<HTMLDivElement>> = ({
     children,
     ...props
 }) => {
@@ -34,7 +34,6 @@ const GroupR: React.FC<CheckboxGroupProps & React.RefAttributes<HTMLDivElement>>
         </Group>
     );
 };
-
-export { GroupR as Group };
+const GroupR: typeof Group = Object.assign(GroupComponent, Group)
 CheckboxR.Group = GroupR;
 export default CheckboxR;

@@ -39,10 +39,10 @@
         "url": "https://github.com/Peng-YT/react-component/issues"
     },
     "gitHead": "2efec65235ff9cc70559842f9831f5ece98bc7ec",
-    "dependencies": {
-        "@types/antd": "^1.0.0",
-        "@types/react": "^18.0.28",
-        "antd": "^5.2.1",
-        "react": "^18.2.0"
+    "peerDependencies": {
+        "@types/antd": ">=1.0.0",
+        "@types/react": ">=18.0.28",
+        "antd": ">=5.0.0",
+        "react": ">=18.0.0"
     }
 }

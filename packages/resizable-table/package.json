@@ -23,12 +23,12 @@
         ],
         "varName": "ResizableTable"
     },
-    "dependencies": {
-        "@types/antd": "^1.0.0",
-        "@types/react": "^18.0.28",
-        "antd": "^5.2.1",
-        "react": "^18.2.0",
-        "react-resizable": "^3.0.4"
+    "peerDependencies": {
+        "@types/antd": ">=1.0.0",
+        "@types/react": ">=18.0.28",
+        "antd": ">=5.0.0",
+        "react": ">=18.0.0",
+        "react-resizable": ">=3.0.4"
     },
     "repository": {
         "type": "git",
