@@ -48,10 +48,10 @@ const cmpValues = (userInput, controllerValue) => {
     if (!Array.isArray(controllerValue) && Array.isArray(userInput)) {
         return userInput.includes(controllerValue);
     }
-    if (typeof userInput === 'symbol' || typeof controllerValue === 'symbol') {
-        return userInput === controllerValue;
+    if (Number.isNaN(userInput) && Number.isNaN(controllerValue)) {
+        return true;
     }
-    return `${userInput || ''}` === `${controllerValue || ''}`;
+    return userInput === controllerValue;
 };
 
 const hasProp = (obj: Record<string, any>, key) => {
