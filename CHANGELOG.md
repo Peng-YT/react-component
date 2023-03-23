@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [2.1.1](https://github.com/Peng-YT/react-component/compare/v2.1.0...v2.1.1) (2023-03-23)
+
+
+### Features
+
+* **form-relation:** fix ([97b7f94](https://github.com/Peng-YT/react-component/commit/97b7f94d36ce5af7e0812e579fa3ce17e028e974))
+
+
+
+
+
 # [2.1.0](https://github.com/Peng-YT/react-component/compare/v2.0.2...v2.1.0) (2023-03-17)
 
 
