@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [2.2.0](https://github.com/Peng-YT/react-component/compare/v2.1.1...v2.2.0) (2023-05-07)
+
+
+### Features
+
+* **form-relation:** 联动条件支持默认值、支持【并】【或】操作进行条件匹配 ([70119b5](https://github.com/Peng-YT/react-component/commit/70119b5e7ff642b85577ac2c10a3bb861158a9fb))
+
+
+
+
+
 ## [2.1.1](https://github.com/Peng-YT/react-component/compare/v2.1.0...v2.1.1) (2023-03-23)
 
 
