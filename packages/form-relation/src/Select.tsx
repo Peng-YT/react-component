@@ -14,14 +14,14 @@ import {
     optionIsDisabled,
     isDisabled,
     RelationInfoContext,
-    getMatchController,
+    getMatchRelationResByFormData,
     NameContext,
     FormInstanceContext,
     mergeRelation,
     OtherFormDataContext,
     optionIsHide,
     TriggerRelationContext,
-} from './Index';
+} from '.';
 import { useRelation } from './hook';
 
 function SelectComponent<VT extends SelectValue = SelectValue>({
@@ -36,7 +36,7 @@ function SelectComponent<VT extends SelectValue = SelectValue>({
     const otherFormData = useContext(OtherFormDataContext);
     const triggerRelation = useContext(TriggerRelationContext);
     const matchController = useMemo(
-        () => getMatchController(relationInfo, form?.getFieldsValue(true) || {}, otherFormData),
+        () => getMatchRelationResByFormData(relationInfo, form?.getFieldsValue(true) || {}, otherFormData),
         [relationInfo, form?.getFieldsValue(true), otherFormData],
     );
     const relationDetail = useMemo(

@@ -11,7 +11,14 @@ export declare const FormInstanceContext: React.Context<FormInstance<any>>;
 export declare const OtherFormDataContext: React.Context<Record<string, any>>;
 export declare const TriggerRelationContext: React.Context<boolean>;
 export declare const NameContext: React.Context<string>;
-export declare const getMatchController: (relationInfoList: FormRelationType[], formData: Record<string, any>, otherFormData?: Record<string, any> | null) => FormRelationType<any>[];
+/**
+ * 在表单联动的影响下 该字段是否可设置
+ * @param field
+ * @returns
+ */
+export declare const getFieldIsOpen: (field?: FormRelationDetailType) => boolean;
+/** 根据表单值，获取条件匹配的表单联动关系信息 */
+export declare function getMatchRelationResByFormData<Info extends any>(relationInfoList: FormRelationType<Info>[], formData: Partial<Record<keyof Info, any>>, otherFormData?: Partial<Record<keyof Info, any>> | null): FormRelationType<Info>[];
 export declare const optionIsDisabled: (props: Record<string, any>, relationDetail: FormRelationDetailType, optionsValueProp?: string) => any;
 export declare const optionIsHide: (props: Record<string, any>, relationDetail: FormRelationDetailType, optionsValueProp?: string) => any;
 export declare const isDisabled: (props: Record<string, any>, relationDetail: FormRelationDetailType) => any;
@@ -24,7 +31,7 @@ export declare const mergeRelation: (prevRelation: Partial<Record<any, FormRelat
  * @param triggerChangeKeys 触发了此次更新的表单key
  * @returns 联动计算之后最终的表单值
  */
-export declare const initRelationValue: (relationInfo: FormRelationType[], pendingFormValues: Record<string, any>, prevEffectValues: Record<string, any>, triggerChangeKeys: any[], needTriggerRest?: boolean) => Record<string, any>;
+export declare function initRelationValue<Info extends any>(relationInfo: FormRelationType<Info>[], pendingFormValues: Partial<Record<keyof Info, any>>, prevEffectValues: Partial<Record<keyof Info, any>>, triggerChangeKeys: any[], needTriggerReset?: boolean): Partial<Record<keyof Info, any>>;
 type FormItemType = typeof Form.Item;
 declare function ItemComponent<Values = any>({ children, ...props }: FormItemProps<Values>): JSX.Element;
 declare const ItemR: typeof ItemComponent & Omit<FormItemType, ''>;

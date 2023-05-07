@@ -32,53 +32,92 @@ export const TriggerRelationContext = createContext<boolean>(true);
 
 export const NameContext = createContext('');
 
-const cmpValues = (userInput, controllerValue) => {
-    if (typeof controllerValue === 'function') {
-        return controllerValue(userInput);
-    }
-    if (Array.isArray(userInput) && Array.isArray(controllerValue)) {
+const isSame = (value1, value2) => {
+    if (Array.isArray(value1) && Array.isArray(value2)) {
         return (
-            userInput.length === controllerValue.length &&
-            userInput.every((input) => controllerValue.includes(input))
-        );
+            value1.length === value2.length &&
+            value1.every((input) => value2.includes(input))
+        )
     }
-    if (Array.isArray(controllerValue) && !Array.isArray(userInput)) {
-        return controllerValue.includes(userInput);
+    if (Array.isArray(value2) && !Array.isArray(value1)) {
+        return value2.includes(value1)
     }
-    if (!Array.isArray(controllerValue) && Array.isArray(userInput)) {
-        return userInput.includes(controllerValue);
+    if (!Array.isArray(value2) && Array.isArray(value1)) {
+        return value1.includes(value2)
     }
-    if (Number.isNaN(userInput) && Number.isNaN(controllerValue)) {
-        return true;
+    /* if (typeof value1 === 'symbol' || typeof value2 === 'symbol') {
+        return value1 === value2;
+    } */
+    if (Number.isNaN(value1) && Number.isNaN(value2)) {
+        return true
     }
-    return userInput === controllerValue;
-};
+    return value1 === value2
+}
+
+// 判断表单值是否匹配到了某个联动关系的条件
+const formValueIsMatchInCondition = (formValue, conditionVal) => {
+    if (typeof conditionVal === 'function') {
+        return conditionVal(formValue)
+    }
+    return isSame(formValue, conditionVal)
+}
 
 const hasProp = (obj: Record<string, any>, key) => {
     return Object.keys(obj).includes(key);
 };
 
-export const getMatchController = (
-    relationInfoList: FormRelationType[],
-    formData: Record<string, any>,
-    otherFormData?: Record<string, any> | null,
-) => {
+/**
+ * 在表单联动的影响下 该字段是否可设置
+ * @param field
+ * @returns
+ */
+export const getFieldIsOpen = (field?: FormRelationDetailType) => {
+    return field !== false
+}
+
+/** 根据表单值，获取条件匹配的表单联动关系信息 */
+export function getMatchRelationResByFormData<Info extends any>(
+    relationInfoList: FormRelationType<Info>[],
+    formData: Partial<Record<keyof Info, any>>,
+    otherFormData?: Partial<Record<keyof Info, any>> | null,
+) {
+    // 是否匹配到了这个条件
+    const isMatchCondition = (
+        conditions: FormRelationType<Info>['conditions'],
+        matchRule: 'OR' | 'AND' = 'AND',
+    ) => {
+        if (conditions === 'default') {
+            return true
+        }
+        const matchFn = matchRule === 'AND' ? conditions.every : conditions.some
+        return matchFn.call(conditions, (condition) => {
+            let formValue: any
+            if (otherFormData) {
+                formValue = hasProp(formData, condition.key)
+                    ? formData[condition.key as string]
+                    : otherFormData[condition.key as string]
+            } else {
+                formValue = formData[condition.key as string]
+            }
+            const isMatch = formValueIsMatchInCondition(
+                formValue,
+                condition.value,
+            )
+            if (isMatch && condition.conditions) {
+                return isMatchCondition(
+                    condition.conditions,
+                    condition.matchRule,
+                )
+            }
+            return isMatch
+        })
+    }
     return relationInfoList
         .filter((item) => {
-            const rule = item.matchRule || 'AND';
-            const matchFn = rule === 'AND' ? item.controller.every : item.controller.some;
-            return matchFn.call(item.controller, (ctr) => {
-                if (otherFormData) {
-                    const userInput =
-                        formData[ctr.key as string] || otherFormData[ctr.key as string];
-                    return cmpValues(userInput, ctr.value);
-                }
-                const userInput = formData[ctr.key as string];
-                return cmpValues(userInput, ctr.value);
-            });
+            return isMatchCondition(item.conditions, item.matchRule)
         })
-        .sort((a, b) => (a.weight || 0) - (b.weight || 0));
-};
+        .sort((a, b) => (a.weight || 0) - (b.weight || 0))
+}
 
 export const optionIsDisabled = (
     props: Record<string, any>,
@@ -222,14 +261,17 @@ const getValuesFromRelation = (
         };
     }, {});
 };
-const cmpMatch = (match1: FormRelationType<any>[], match2: FormRelationType<any>[]) => {
+const cmpArray = (
+    match1: FormRelationType<any>[],
+    match2: FormRelationType<any>[],
+) => {
     if (match1.length !== match2.length) {
-        return false;
+        return false
     }
     return match1.every((item) => {
-        return match2.indexOf(item) > -1;
-    });
-};
+        return match2.indexOf(item) > -1
+    })
+}
 /** 获取 值发生了变化的key */
 const getValueChangeKeys = (prevValues, curValues) => {
     const allKeys = [...new Set(Object.keys(prevValues).concat(Object.keys(curValues)))];
@@ -250,59 +292,79 @@ const getValueChangeKeys = (prevValues, curValues) => {
  * @param triggerChangeKeys 触发了此次更新的表单key
  * @returns 联动计算之后最终的表单值
  */
-export const initRelationValue = (
-    relationInfo: FormRelationType[],
-    pendingFormValues: Record<string, any>,
-    prevEffectValues: Record<string, any>,
+export function initRelationValue<Info extends any>(
+    relationInfo: FormRelationType<Info>[],
+    pendingFormValues: Partial<Record<keyof Info, any>>,
+    prevEffectValues: Partial<Record<keyof Info, any>>,
     triggerChangeKeys: any[],
-    needTriggerRest = true,
-): Record<string, any> => {
-    const match = getMatchController(relationInfo, pendingFormValues);
-    const relation: Record<string, FormRelationDetailType> = match.reduce((prev, cur) => {
-        const isTrigger = cur.controller.find((item) => triggerChangeKeys.includes(item.key));
-        const curRelation: FormRelationType<any>['relation'] = {
-            ...cur.relation,
-        };
-        if (isTrigger && needTriggerRest) {
-            // eslint-disable-next-line no-restricted-syntax, guard-for-in
-            for (const key in curRelation) {
-                const detail = curRelation[key];
-                if (detail && hasProp(detail, 'resetValue') && !hasProp(detail, 'value')) {
-                    curRelation[key] = {
-                        ...detail,
-                        value: detail.resetValue,
-                    };
+    needTriggerReset = true,
+): Partial<Record<keyof Info, any>> {
+    const match = getMatchRelationResByFormData(relationInfo, pendingFormValues)
+
+    const relation: Record<string, FormRelationDetailType> = match.reduce(
+        (prev, cur) => {
+            const isTrigger =
+                cur.conditions === 'default' ||
+                cur.conditions.find((item) =>
+                    triggerChangeKeys.includes(item.key),
+                )
+            const isDefault = cur.conditions === 'default'
+            const curRelation: FormRelationType<any>['relation'] = {
+                ...cur.relation,
+            }
+            if (isTrigger && needTriggerReset) {
+                // eslint-disable-next-line no-restricted-syntax, guard-for-in
+                for (const prop in curRelation) {
+                    const curRelationDetail = curRelation[prop]
+                    const needResetWhenOnlyEmpty =
+                        curRelationDetail === false ||
+                        (curRelationDetail?.needResetWhenOnlyEmpty ?? true)
+                    const curRelationResetValueIsValid = // 重置值是否可用
+                        curRelationDetail &&
+                        hasProp(curRelationDetail, 'resetValue') && // 拥有重置值
+                        !hasProp(curRelationDetail, 'value') // 没有固定值value
+                    const needResetValue = // 需要重置的条件
+                        !needResetWhenOnlyEmpty || // 关闭了【值为空时进行重置】
+                        (needResetWhenOnlyEmpty && !pendingFormValues[prop]) || // 值为空、并且开启了【值为空时进行重置】
+                        (isDefault && !pendingFormValues[prop]) // 值为空、并且拥有默认值
+                    if (curRelationResetValueIsValid && needResetValue) {
+                        curRelation[prop] = {
+                            ...curRelationDetail,
+                            value: curRelationDetail.resetValue,
+                        }
+                    }
                 }
             }
-        }
-        return mergeRelation(prev, curRelation);
-    }, {});
-    const effectValues = getValuesFromRelation(relation, pendingFormValues);
+            return mergeRelation(prev, curRelation)
+        },
+        {},
+    )
+    const effectValues = getValuesFromRelation(relation, pendingFormValues)
     const newFormValues = {
         ...pendingFormValues,
         ...effectValues,
-    };
-    const nextMatch = getMatchController(relationInfo, newFormValues);
-    const equalMatch = cmpMatch(match, nextMatch);
-    let res = { ...prevEffectValues, ...effectValues };
+    }
+    const nextMatch = getMatchRelationResByFormData(relationInfo, newFormValues)
+    const equalMatch = cmpArray(match, nextMatch)
+    let allEffectRes = { ...prevEffectValues, ...effectValues }
     if (!equalMatch) {
-        res = initRelationValue(
+        allEffectRes = initRelationValue(
             relationInfo,
             newFormValues,
-            res,
+            allEffectRes,
             getValueChangeKeys(pendingFormValues, newFormValues),
-            needTriggerRest,
-        );
+            needTriggerReset,
+        )
     }
-    return res;
-};
+    return allEffectRes
+}
 type FormItemType = typeof Form.Item
 function ItemComponent<Values = any>({ children, ...props }: FormItemProps<Values>) {
     const relationInfo = useContext(RelationInfoContext);
     const form = useContext(FormInstanceContext);
     const name = (props.name || '') as string;
     const otherFormData = useContext(OtherFormDataContext);
-    const matchController = getMatchController(
+    const matchController = getMatchRelationResByFormData(
         relationInfo,
         form?.getFieldsValue(true) || {},
         otherFormData,
@@ -378,7 +440,7 @@ function FormComponent<Values = any>({
     const onChange = (effectValues: Record<string, any>) => {
         const { data } = formDataRef.current;
         const valueHasChange = Object.keys(effectValues).some((key) => {
-            return !cmpValues(effectValues[key], data[key]);
+            return !isSame(effectValues[key], data[key]);
         });
         if (valueHasChange) {
             onRelationValueChange(effectValues, true);
@@ -400,7 +462,8 @@ function FormComponent<Values = any>({
             ...(otherFormData || {}),
         };
         const triggerKeys = getValueChangeKeys(oldFormData, formDataRef.current.data);
-        formDataRef.current.triggerKeys = triggerKeys;
+        formDataRef.current.triggerKeys =
+            formDataRef.current.triggerKeys.concat(triggerKeys)
     }, [originFormData, otherFormData]);
     useDebounce(
         () => {
@@ -408,6 +471,7 @@ function FormComponent<Values = any>({
                 return;
             }
             run(formDataRef.current.triggerKeys);
+            formDataRef.current.triggerKeys = []
         },
         100,
         [originFormData, otherFormData],
