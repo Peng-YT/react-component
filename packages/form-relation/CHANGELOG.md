@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [2.3.0](https://github.com/Peng-YT/react-component/compare/v2.2.0...v2.3.0) (2023-09-16)
+
+
+### Features
+
+* **form-relation:** 逻辑优化 ([436f3b2](https://github.com/Peng-YT/react-component/commit/436f3b2105f995f1aa32b22a8d73b50f25ce9aed))
+
+
+
+
+
 # [2.2.0](https://github.com/Peng-YT/react-component/compare/v2.1.1...v2.2.0) (2023-05-07)
 
 
