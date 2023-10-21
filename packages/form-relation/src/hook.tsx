@@ -6,18 +6,16 @@
  * @Description: In User Settings Edit
  * @FilePath: \admin-market\src\components\Common\RelationForm\hook.tsx
  */
+import { AllRelationType } from 'form-relation/types/common'
 import { useContext, useMemo } from 'react'
 import {
     FormInstanceContext,
-    getMatchRelationResByFormData,
-    isDisabled,
-    mergeRelation,
     NameContext,
-    optionIsDisabled,
-    optionIsHide,
     OtherFormDataContext,
     RelationInfoContext,
-} from './Index'
+} from '.'
+import { getMatchRelationResByFormData, isDisabled, mergeRelation, optionIsDisabled, optionIsHide } from './util'
+import { cpmNamePath } from './util';
 
 export const useRelation = (props: Record<string, any>) => {
     const name = useContext(NameContext)
@@ -35,10 +33,16 @@ export const useRelation = (props: Record<string, any>) => {
         [relationInfo, form?.getFieldsValue(true), otherFormData],
     )
     const relationDetail = useMemo(
-        () =>
-            matchController.reduce((prev, cur) => {
+        () => {
+            const allRealtion: AllRelationType = matchController.reduce((prev, cur) => {
                 return mergeRelation(prev, cur.relation)
-            }, {})[name],
+            }, {})
+            if (Array.isArray(name)) {
+                return Object.values(allRealtion).find(item => item && item.keyPath && cpmNamePath(item.keyPath, name))
+            } else {
+                return allRealtion[name]
+            }
+        },
         [matchController, name],
     )
     return {

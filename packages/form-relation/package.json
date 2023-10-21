@@ -37,8 +37,10 @@
         "@types/antd": ">=1.0.0",
         "@types/react": ">=18.0.28",
         "antd": ">=5.0.0",
+        "loadsh": ">=0.0.4",
         "react": ">=18.0.0",
-        "react-use": ">=17.4.0"
+        "react-use": ">=17.4.0",
+        "@types/lodash": ">=4.14.200"
     },
     "gitHead": "f99129b7c7a2d067747d411044dea026a22ca87a",
     "types": "./lib/index.d.ts"
