@@ -1,6 +1,6 @@
 {
     "name": "@ppeng/form-relation",
-    "version": "2.3.0",
+    "version": "3.0.0",
     "description": "> TODO: description",
     "author": "Peng-YT <1305684595@qq.com>",
     "homepage": "https://github.com/Peng-YT/react-component/tree/master/packages/form-relation",
@@ -35,12 +35,12 @@
     },
     "peerDependencies": {
         "@types/antd": ">=1.0.0",
+        "@types/lodash": ">=4.14.200",
         "@types/react": ">=18.0.28",
         "antd": ">=5.0.0",
         "loadsh": ">=0.0.4",
         "react": ">=18.0.0",
-        "react-use": ">=17.4.0",
-        "@types/lodash": ">=4.14.200"
+        "react-use": ">=17.4.0"
     },
     "gitHead": "f99129b7c7a2d067747d411044dea026a22ca87a",
     "types": "./lib/index.d.ts"
