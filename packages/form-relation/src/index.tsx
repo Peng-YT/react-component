@@ -28,30 +28,11 @@ import Radio from './Radio'
 import Select from './Select'
 import Switch from './Switch'
 import { assignDeep, cmpArray, cpmNamePath, getFieldIsOpen, getMatchRelationResByFormData, hasProp, initRelationValue, mergeRelation } from './util'
+import { FormDataContext, FormInstanceContext, FormValidateInfoContext, NameContext, OtherFormDataContext, OtherPropsContext, RelationInfoContext, TriggerRelationContext } from './context'
 
 const { useForm } = Form
 
-export const RelationInfoContext = createContext<FormRelationType[]>([])
 
-export const FormInstanceContext = createContext<FormInstance | null>(null)
-
-export const FormDataContext = createContext<Record<string, any> | null>({})
-
-export const OtherFormDataContext = createContext<
-    Record<string, any> | undefined | null
->(null)
-
-export const FormValidateInfoContext = createContext<
-    FormValidateType | undefined | null
->(null)
-
-export const TriggerRelationContext = createContext<boolean>(true)
-
-export const NameContext = createContext<NamePath>('')
-
-export const OtherPropsContext = createContext<{
-    onVisibleChange?: (visible: boolean, name: NamePath) => any
-}>({})
 
 type FormItemType = typeof Form.Item
 function ItemComponent<Values = any>({

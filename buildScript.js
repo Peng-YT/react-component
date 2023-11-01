@@ -1,9 +1,10 @@
 import fs from "fs";
 import { fileURLToPath } from "url";
-import { resolve } from "path";
+import { resolve, dirname } from "path";
 import cp from "child_process";
 
 const __dirname = fileURLToPath(new URL(".", import.meta.url));
+// console.log(import.meta.url, new URL(".", import.meta.url), fileURLToPath(import.meta.url), dirname(fileURLToPath(import.meta.url)))
 const removeAfterfix = (fileName) => {
     const paths = fileName.split(".");
     const afterfix = paths[paths.length - 1];

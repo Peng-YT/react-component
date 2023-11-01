@@ -24,7 +24,7 @@ const getPkgName = () => {
     return paths[paths.length - 1]
 }
 const getOpts = (format: ModuleFormat, ouputDir: string): RollupOptions => {
-    const isBrowser = format === 'module' || format === 'iife'
+    const isBrowser = format === 'iife'
     const plugins = [
         typescript({
             tsconfig: './tsconfig.json',
@@ -42,7 +42,7 @@ const getOpts = (format: ModuleFormat, ouputDir: string): RollupOptions => {
         external: isBrowser ? undefined : external,
         output: isBrowser ? {
             format,
-            file: `${getPkgName()}.js`,
+            dir: ouputDir,
             name: pkg.buildOpts.varName,
         } : {
             entryFileNames: '[name].js',

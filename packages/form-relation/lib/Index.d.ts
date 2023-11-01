@@ -1,27 +1,11 @@
 import type { FormInstance, FormItemProps, FormProps } from 'antd';
 import { Form } from 'antd';
-import type { NamePath } from 'antd/es/form/interface';
 import { FormRelationType, FormValidateType } from '../types/common';
 import React from 'react';
 import Checkbox from './Checkbox';
 import Radio from './Radio';
 import Select from './Select';
 import Switch from './Switch';
-export declare const RelationInfoContext: React.Context<FormRelationType<any>[]>;
-export declare const FormInstanceContext: React.Context<FormInstance<any>>;
-export declare const FormDataContext: React.Context<Record<string, any>>;
-export declare const OtherFormDataContext: React.Context<Record<string, any>>;
-export declare const FormValidateInfoContext: React.Context<{
-    [x: string]: {
-        rules?: RuleObject[] | ((inject: any) => RuleObject[]);
-        deeps?: any;
-    };
-}>;
-export declare const TriggerRelationContext: React.Context<boolean>;
-export declare const NameContext: React.Context<NamePath>;
-export declare const OtherPropsContext: React.Context<{
-    onVisibleChange?: (visible: boolean, name: NamePath) => any;
-}>;
 type FormItemType = typeof Form.Item;
 declare function ItemComponent<Values = any>({ children, ...props }: FormItemProps<Values>): JSX.Element;
 declare const ItemR: typeof ItemComponent & Omit<FormItemType, ''>;

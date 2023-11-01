@@ -11,15 +11,34 @@
         "test": "__tests__"
     },
     "files": [
+        "esm",
         "lib",
         "types"
     ],
+    "exports": {
+        ".": {
+            "import": "./esm/index.js",
+            "require": "./lib/index.js"
+        },
+        "./util": {
+            "import": "./esm/util.js",
+            "require": "./lib/util.js"
+        },
+        "./hook": {
+            "import": "./esm/hook.js",
+            "require": "./lib/hook.js"
+        }
+    },
     "buildOpts": {
         "formats": [
-            "esm"
+            "esm",
+            "cjs"
         ],
         "entries": [
-            "index.tsx"
+            "index.tsx",
+            "util.ts",
+            "hook.tsx",
+            "context.ts"
         ],
         "varName": "FormRelation"
     },

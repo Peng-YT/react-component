@@ -19,7 +19,7 @@ import {
     OtherFormDataContext,
     RelationInfoContext,
     TriggerRelationContext,
-} from '.'
+} from './context'
 import { getMatchRelationResByFormData, mergeRelation, optionIsDisabled, optionIsHide } from './util'
 import { isDisabled } from './util';
 

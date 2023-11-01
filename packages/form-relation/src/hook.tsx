@@ -13,7 +13,7 @@ import {
     NameContext,
     OtherFormDataContext,
     RelationInfoContext,
-} from '.'
+} from './context'
 import { getMatchRelationResByFormData, isDisabled, mergeRelation, optionIsDisabled, optionIsHide } from './util'
 import { cpmNamePath } from './util';
 

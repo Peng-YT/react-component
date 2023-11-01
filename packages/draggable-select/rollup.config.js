@@ -31,7 +31,7 @@ var getPkgName = function () {
     return paths[paths.length - 1];
 };
 var getOpts = function (format, ouputDir) {
-    var isBrowser = format === 'module' || format === 'iife';
+    var isBrowser = format === 'iife';
     var plugins = [
         typescript({
             tsconfig: './tsconfig.json'
@@ -49,7 +49,7 @@ var getOpts = function (format, ouputDir) {
         external: isBrowser ? undefined : external,
         output: isBrowser ? {
             format: format,
-            file: "".concat(getPkgName(), ".js"),
+            dir: ouputDir,
             name: pkg.buildOpts.varName
         } : {
             entryFileNames: '[name].js',
