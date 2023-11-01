@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [3.1.0](https://github.com/Peng-YT/react-component/compare/v3.0.0...v3.1.0) (2023-11-01)
+
+
+### Features
+
+* 打包模块优化 ([84a94f4](https://github.com/Peng-YT/react-component/commit/84a94f4ea51bdd97818ca9fa71e073ba2abee781))
+
+
+
+
+
 # [3.0.0](https://github.com/Peng-YT/react-component/compare/v2.3.0...v3.0.0) (2023-10-21)
 
 **Note:** Version bump only for package @ppeng/resizable-table
