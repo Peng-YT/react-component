@@ -15,12 +15,19 @@ export declare const assignDeep: (origin: unknown, newData: unknown, { mutable }
 }) => unknown;
 export declare const getObjVal: (obj: Record<string, any>, key: any) => any;
 export declare const isMatch: (value1: any, value2: any) => boolean;
-export declare const formValueIsMatchInCondition: (formValue: any, conditionVal: any, formData: any) => any;
-export declare function isMatchCondition<Info>(conditions: FormRelationType<Info>['conditions'], matchRule: 'OR' | 'AND', formData: Record<string, any>, otherFormData?: Record<string, any> | null): boolean;
+export declare const formValueIsMatchInCondition: (formValue: any, conditionVal: any, formData: any, { prevVal, prevFormData }: {
+    prevVal: any;
+    prevFormData: any;
+}) => any;
+export declare function isMatchCondition<Info>(conditions: FormRelationType<Info>['conditions'], matchRule: 'OR' | 'AND', formData: Info, props: {
+    oldFormData: Info;
+}): boolean;
 export declare function and<Info extends any>(params: FormRelationOpParamType<Info>): FormRelationOpResType<Info>;
 export declare function or<Info extends any>(params: FormRelationOpParamType<Info>): FormRelationOpResType<Info>;
 /** 根据表单值，获取条件匹配的表单联动关系信息 */
-export declare function getMatchRelationResByFormData<Info extends object>(relationInfoList: FormRelationType<Info>[], formData: Partial<Record<keyof Info, any>>, otherFormData?: Partial<Record<keyof Info, any>> | null): FormRelationType<Info>[];
+export declare function getMatchRelationResByFormData<Info extends object>(relationInfoList: FormRelationType<Info>[], formData: Info, props?: {
+    oldFormData?: Info;
+}): FormRelationType<Info>[];
 /**
  *
  * @param relationInfo 表单联动配置
@@ -55,7 +62,9 @@ export declare function mergeRelation<Info extends object>(prevRelation: AllRela
  * @param formData 表单校验依赖的数据，需要传入哪些数据，根据传入的relationInfoList的类型决定 如果relationInfoList的ts类型为 FormRelationTypeFormRelationType(Dep)[]  那么formData就需要传入Dep类型的数据
  * @returns
  */
-export declare function getCondition<Info extends object>(relationInfoList: FormRelationType<Info>[], formData: Partial<Record<keyof Info, any>>): Partial<Record<keyof Info, FormRelationDetailType>>;
+export declare function getCondition<Info extends object>(relationInfoList: FormRelationType<Info>[], formData: Info, props?: {
+    oldFormData?: Info;
+}): Partial<Record<keyof Info, FormRelationDetailType>>;
 /**
  * 在表单联动的影响下 该字段是否可设置
  * @param field
@@ -77,8 +86,8 @@ export declare const cmpArray: (match1: FormRelationType<any>[], match2: FormRel
  * @param triggerChangeKey 触发此次联动的表单控件的key
  * @returns 表单变化的值
  */
-export declare function initRelationValue<Info extends object>(relationInfo: FormRelationType<Info>[], pendingFormValues: Partial<Record<keyof Info, any>>, prevEffectValues: Partial<Record<keyof Info, any>>, needTriggerReset?: boolean, props?: {
+export declare function initRelationValue<Info extends object>(relationInfo: FormRelationType<Info>[], pendingFormValues: Info, prevEffectValues: Partial<Record<keyof Info, any>>, needTriggerReset?: boolean, props?: {
     recoverData?: Record<string, any>;
-    oldFormValues?: Partial<Record<keyof Info, any>>;
+    oldFormValues?: Info;
     triggerChangeKey?: NamePath;
 }): Partial<Record<keyof Info, any>>;

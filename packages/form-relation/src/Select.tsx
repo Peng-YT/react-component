@@ -2,10 +2,10 @@
 /*
  * @Author: 彭越腾
  * @Date: 2021-08-18 17:55:28
- * @LastEditTime: 2023-10-19 16:31:11
+ * @LastEditTime: 2023-11-23 13:44:25
  * @LastEditors: 彭越腾
  * @Description: In User Settings Edit
- * @FilePath: \admin-market\src\components\Common\RelationForm\Select.tsx
+ * @FilePath: \react-component\packages\form-relation\src\Select.tsx
  */
 
 import { SelectProps, Typography } from 'antd'
@@ -20,8 +20,9 @@ import {
     RelationInfoContext,
     TriggerRelationContext,
 } from './context'
-import { getMatchRelationResByFormData, mergeRelation, optionIsDisabled, optionIsHide } from './util'
+import { cpmNamePath, getMatchRelationResByFormData, mergeRelation, optionIsDisabled, optionIsHide } from './util'
 import { isDisabled } from './util';
+import { AllRelationType } from 'form-relation/types/common'
 
 function SelectComponent<VT extends SelectValue = SelectValue>({
     children,
@@ -30,7 +31,6 @@ function SelectComponent<VT extends SelectValue = SelectValue>({
     ref?: React.Ref<any> | undefined
 }) {
     const name = useContext(NameContext)
-    const prop = Array.isArray(name) ? name[name.length - 1] : name
     const relationInfo = useContext(RelationInfoContext)
     // const form = useContext(FormInstanceContext)
     const formData = useContext(FormDataContext)
@@ -40,17 +40,25 @@ function SelectComponent<VT extends SelectValue = SelectValue>({
         () =>
             getMatchRelationResByFormData(
                 relationInfo,
-                formData || {},
-                otherFormData,
+                {
+                    ...(formData || {}),
+                    ...(otherFormData || {}),
+                },
             ),
         [relationInfo, formData, otherFormData],
     )
     const relationDetail = useMemo(
-        () =>
-            matchController.reduce((prev, cur) => {
+        () => {
+            const allRelation: AllRelationType = matchController.reduce((prev, cur) => {
                 return mergeRelation(prev, cur.relation)
-            }, {})[prop],
-        [matchController, prop],
+            }, {})
+            if (Array.isArray(name)) {
+                return Object.values(allRelation).find(item => item && item.keyPath && cpmNamePath(item.keyPath, name))
+            } else {
+                return allRelation[name]
+            }
+        },
+        [matchController, name],
     )
     const filterChildren = (children?: any) => {
         return children

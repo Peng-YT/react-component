@@ -5,7 +5,7 @@ import { useDebounce } from 'react-use';
 import { InfoCircleOutlined } from '@ant-design/icons';
 import { useRelation } from './hook.js';
 import { NameContext, RelationInfoContext, FormDataContext, OtherFormDataContext, TriggerRelationContext, FormValidateInfoContext, OtherPropsContext, FormInstanceContext } from './context.js';
-import { getMatchRelationResByFormData, mergeRelation, optionIsHide, optionIsDisabled, isDisabled, cpmNamePath, getFieldIsOpen, assignDeep, hasProp, initRelationValue, cmpArray } from './util.js';
+import { getMatchRelationResByFormData, mergeRelation, cpmNamePath, optionIsHide, optionIsDisabled, isDisabled, getFieldIsOpen, assignDeep, hasProp, initRelationValue, cmpArray } from './util.js';
 
 /*
  * @Author: 彭越腾
@@ -67,23 +67,33 @@ RadioR.Group = GroupR;
 /*
  * @Author: 彭越腾
  * @Date: 2021-08-18 17:55:28
- * @LastEditTime: 2023-10-19 16:31:11
+ * @LastEditTime: 2023-11-23 13:44:25
  * @LastEditors: 彭越腾
  * @Description: In User Settings Edit
- * @FilePath: \admin-market\src\components\Common\RelationForm\Select.tsx
+ * @FilePath: \react-component\packages\form-relation\src\Select.tsx
  */
 function SelectComponent({ children, ...props }) {
     const name = useContext(NameContext);
-    const prop = Array.isArray(name) ? name[name.length - 1] : name;
     const relationInfo = useContext(RelationInfoContext);
     // const form = useContext(FormInstanceContext)
     const formData = useContext(FormDataContext);
     const otherFormData = useContext(OtherFormDataContext);
     const triggerRelation = useContext(TriggerRelationContext);
-    const matchController = useMemo(() => getMatchRelationResByFormData(relationInfo, formData || {}, otherFormData), [relationInfo, formData, otherFormData]);
-    const relationDetail = useMemo(() => matchController.reduce((prev, cur) => {
-        return mergeRelation(prev, cur.relation);
-    }, {})[prop], [matchController, prop]);
+    const matchController = useMemo(() => getMatchRelationResByFormData(relationInfo, {
+        ...(formData || {}),
+        ...(otherFormData || {}),
+    }), [relationInfo, formData, otherFormData]);
+    const relationDetail = useMemo(() => {
+        const allRelation = matchController.reduce((prev, cur) => {
+            return mergeRelation(prev, cur.relation);
+        }, {});
+        if (Array.isArray(name)) {
+            return Object.values(allRelation).find(item => item && item.keyPath && cpmNamePath(item.keyPath, name));
+        }
+        else {
+            return allRelation[name];
+        }
+    }, [matchController, name]);
     const filterChildren = (children) => {
         return children
             ?.filter?.((item) => {
@@ -125,10 +135,10 @@ const SwitchR = Object.assign(SwitchComponent, Switch);
 /*
  * @Author: 彭越腾
  * @Date: 2021-08-16 17:33:33
- * @LastEditTime: 2023-10-20 17:33:08
+ * @LastEditTime: 2023-11-23 13:45:56
  * @LastEditors: 彭越腾
  * @Description: 能控制各个字段之间联动的表单
- * @FilePath: \admin-market\src\components\Common\RelationForm\Index.tsx
+ * @FilePath: \react-component\packages\form-relation\src\index.tsx
  */
 const { useForm } = Form;
 function ItemComponent({ children, ...props }) {
@@ -139,7 +149,12 @@ function ItemComponent({ children, ...props }) {
     const name = props.name || '';
     const otherFormData = useContext(OtherFormDataContext);
     const otherProps = useContext(OtherPropsContext);
-    const matchController = getMatchRelationResByFormData(relationInfo, formData || {}, otherFormData);
+    const matchController = getMatchRelationResByFormData(relationInfo, {
+        ...(formData || {}),
+        ...(otherFormData || {}),
+    }, {
+        oldFormData: {},
+    });
     const allRelation = matchController.reduce((prev, cur) => {
         return {
             ...prev,
