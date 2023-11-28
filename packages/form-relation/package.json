@@ -61,6 +61,6 @@
         "react": ">=18.0.0",
         "react-use": ">=17.4.0"
     },
-    "gitHead": "f99129b7c7a2d067747d411044dea026a22ca87a",
+    "gitHead": "15c39af3e20b71612859dbea88639076d3da9c5f",
     "types": "./lib/index.d.ts"
 }

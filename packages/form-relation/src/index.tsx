@@ -2,7 +2,7 @@
 /*
  * @Author: 彭越腾
  * @Date: 2021-08-16 17:33:33
- * @LastEditTime: 2023-11-23 13:45:56
+ * @LastEditTime: 2023-11-28 15:02:00
  * @LastEditors: 彭越腾
  * @Description: 能控制各个字段之间联动的表单
  * @FilePath: \react-component\packages\form-relation\src\index.tsx
@@ -353,7 +353,7 @@ function FormComponent<Values = any>({
             run()
         },
         200,
-        [originFormData, otherFormData],
+        [originFormData, otherFormData, relationInfo],
     )
 
     return (

@@ -1,6 +1,6 @@
 'use strict';
 
-var util = require('./util-bdad4a33.js');
+var util = require('./util-259eb911.js');
 require('./_commonjsHelpers-22a5398b.js');
 
 
@@ -18,6 +18,7 @@ exports.getValuesFromRelation = util.getValuesFromRelation;
 exports.hasProp = util.hasProp;
 exports.initRelationValue = util.initRelationValue;
 exports.isDisabled = util.isDisabled;
+exports.isEqualName = util.isEqualName;
 exports.isMatch = util.isMatch;
 exports.isMatchCondition = util.isMatchCondition;
 exports.mergeRelation = util.mergeRelation;

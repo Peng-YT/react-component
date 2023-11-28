@@ -397,6 +397,14 @@ const cpmNamePath = (name1, name2) => {
         return item === name2[index];
     });
 };
+const isEqualName = (name1, name2) => {
+    if (Array.isArray(name1) && Array.isArray(name2)) {
+        return cpmNamePath(name1, name2);
+    }
+    const name1Res = Array.isArray(name1) && name1.length === 1 ? name1[0] : name1;
+    const name2Res = Array.isArray(name2) && name2.length === 1 ? name2[0] : name2;
+    return name1Res === name2Res;
+};
 const cmpArray = (match1, match2) => {
     if (match1.length !== match2.length) {
         return false;
@@ -438,9 +446,19 @@ function initRelationValue(relationInfo, pendingFormValues, prevEffectValues, ne
         if (isDefaultOrNewCondition && needTriggerReset) {
             // eslint-disable-next-line no-restricted-syntax, guard-for-in
             for (const prop in curRelation) {
+                const curRelationDetail = curRelation[prop];
+                /** 如果联动是由该字段引起的，则该字段无需做值重置，避免循环 */
+                const name = curRelationDetail && curRelationDetail?.keyPath
+                    ? curRelationDetail.keyPath
+                    : prop;
+                const isTriggerTarget = props?.triggerChangeKey
+                    ? isEqualName(name, props?.triggerChangeKey)
+                    : false;
+                if (isTriggerTarget) {
+                    continue;
+                }
                 const valueIsEmpty = !hasProp(pendingFormValues, prop) ||
                     pendingFormValues[prop] === undefined;
-                const curRelationDetail = curRelation[prop];
                 const needResetWhenOnlyEmpty = // 仅值为空时才进行值的重置
                  curRelationDetail === false ||
                     (curRelationDetail?.needResetWhenOnlyEmpty ?? true);
@@ -514,4 +532,4 @@ function initRelationValue(relationInfo, pendingFormValues, prevEffectValues, ne
     }
 }
 
-export { and, assignDeep, cmpArray, cpmNamePath, formValueIsMatchInCondition, getCondition, getFieldIsOpen, getMatchRelationResByFormData, getObjVal, getValuesFromRelation, hasProp, initRelationValue, isDisabled, isMatch, isMatchCondition, mergeRelation, optionIsDisabled, optionIsHide, or, validateFromRelationInfo };
+export { and, assignDeep, cmpArray, cpmNamePath, formValueIsMatchInCondition, getCondition, getFieldIsOpen, getMatchRelationResByFormData, getObjVal, getValuesFromRelation, hasProp, initRelationValue, isDisabled, isEqualName, isMatch, isMatchCondition, mergeRelation, optionIsDisabled, optionIsHide, or, validateFromRelationInfo };

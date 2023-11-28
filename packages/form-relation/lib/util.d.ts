@@ -73,6 +73,7 @@ export declare function getCondition<Info extends object>(relationInfoList: Form
 export declare const getFieldIsOpen: (field?: FormRelationDetailType) => boolean;
 export declare function getValuesFromRelation<Info>(relation: AllRelationType<Info>, pendingFormValues: Record<string, any>): {};
 export declare const cpmNamePath: (name1: any[], name2: any[]) => boolean;
+export declare const isEqualName: (name1: NamePath, name2: NamePath) => boolean;
 export declare const cmpArray: (match1: FormRelationType<any>[], match2: FormRelationType<any>[]) => boolean;
 /**
  * 根据表单联动关系和现有的表单值，生成一些需要变化的值
