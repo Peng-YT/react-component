@@ -51,6 +51,7 @@ const Test = () => {
     ]
     const onRelationValueChange = (effect) => {
         console.log('1s后 表单项3的值为value-3-1！！', effect['item-3'] === 'value-3-1')
+        console.log('2s后 表单项4的值被清空了，且组件隐藏了！！', effect['item-4'] === undefined)
     }
     useEffect(() => {
         setTimeout(() => {
@@ -59,6 +60,14 @@ const Test = () => {
             })
             console.log('1s后 单项2的值被修改为：value-2-2')
         }, 1000)
+    }, [])
+    useEffect(() => {
+        setTimeout(() => {
+            form.setFieldsValue({
+                ‘item-3’: 'value-3-2'
+            })
+            console.log('2s后 单项3的值被修改为：value-3-2')
+        }, 2000)
     }, [])
     return <Form
         form={form}
