@@ -1,50 +1,49 @@
 {
-    "name": "@ppeng/resizable-table",
-    "version": "3.1.0",
-    "description": "> TODO: description",
-    "author": "Peng-YT <1305684595@qq.com>",
-    "homepage": "https://github.com/Peng-YT/react-component/tree/master/packages/resizable-table",
-    "license": "ISC",
-    "main": "lib/index.js",
-    "type": "module",
-    "directories": {
-        "lib": "lib",
-        "test": "__tests__"
-    },
-    "files": [
-        "lib"
+  "name": "@ppeng/resizable-table",
+  "version": "3.1.0",
+  "description": "> TODO: description",
+  "author": "Peng-YT <1305684595@qq.com>",
+  "homepage": "https://github.com/Peng-YT/react-component/tree/master/packages/resizable-table",
+  "license": "ISC",
+  "main": "lib/index.js",
+  "type": "module",
+  "directories": {
+    "lib": "lib"
+  },
+  "files": [
+    "lib"
+  ],
+  "buildOpts": {
+    "formats": [
+      "esm"
     ],
-    "buildOpts": {
-        "formats": [
-            "esm"
-        ],
-        "entries": [
-            "index.tsx"
-        ],
-        "varName": "ResizableTable"
-    },
-    "peerDependencies": {
-        "@types/antd": ">=1.0.0",
-        "@types/react": ">=18.0.28",
-        "antd": ">=5.0.0",
-        "react": ">=18.0.0",
-        "react-resizable": ">=3.0.4"
-    },
-    "repository": {
-        "type": "git",
-        "url": "git+https://github.com/Peng-YT/react-component.git"
-    },
-    "publishConfig": {
-        "registry": "https://registry.npmjs.org/",
-        "access": "public"
-    },
-    "scripts": {
-        "test": "echo \"Error: run tests from root\" && exit 1",
-        "build": "rollup --config ./rollup.config.js",
-        "i": "npm i"
-    },
-    "types": "./lib/index.d.ts",
-    "bugs": {
-        "url": "https://github.com/Peng-YT/react-component/issues"
-    }
+    "entries": [
+      "index.tsx"
+    ],
+    "varName": "ResizableTable"
+  },
+  "peerDependencies": {
+    "@types/antd": ">=1.0.0",
+    "@types/react": ">=18.0.28",
+    "antd": ">=5.0.0",
+    "react": ">=18.0.0",
+    "react-resizable": ">=3.0.4"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Peng-YT/react-component.git"
+  },
+  "publishConfig": {
+    "registry": "https://registry.npmjs.org/",
+    "access": "public"
+  },
+  "scripts": {
+    "test": "echo \"Error: run tests from root\" && exit 1",
+    "build": "rollup --config ./rollup.config.js",
+    "i": "npm i"
+  },
+  "types": "./lib/index.d.ts",
+  "bugs": {
+    "url": "https://github.com/Peng-YT/react-component/issues"
+  }
 }

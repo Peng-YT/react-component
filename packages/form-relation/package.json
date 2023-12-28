@@ -1,66 +1,71 @@
 {
-    "name": "@ppeng/form-relation",
-    "version": "3.1.1",
-    "description": "> TODO: description",
-    "author": "Peng-YT <1305684595@qq.com>",
-    "homepage": "https://github.com/Peng-YT/react-component/tree/master/packages/form-relation",
-    "license": "ISC",
-    "main": "lib/index.js",
-    "directories": {
-        "lib": "lib",
-        "test": "__tests__"
+  "name": "@ppeng/form-relation",
+  "version": "3.1.1",
+  "description": "> TODO: description",
+  "author": "Peng-YT <1305684595@qq.com>",
+  "homepage": "https://github.com/Peng-YT/react-component/tree/master/packages/form-relation",
+  "license": "ISC",
+  "main": "lib/index.js",
+  "directories": {
+    "lib": "lib"
+  },
+  "files": [
+    "esm",
+    "lib",
+    "types"
+  ],
+  "exports": {
+    ".": {
+      "import": "./esm/index.js",
+      "require": "./lib/index.js"
     },
-    "files": [
-        "esm",
-        "lib",
-        "types"
+    "./util": {
+      "import": "./esm/util.js",
+      "require": "./lib/util.js"
+    },
+    "./hook": {
+      "import": "./esm/hook.js",
+      "require": "./lib/hook.js"
+    }
+  },
+  "buildOpts": {
+    "formats": [
+      "esm",
+      "cjs"
     ],
-    "exports": {
-        ".": {
-            "import": "./esm/index.js",
-            "require": "./lib/index.js"
-        },
-        "./util": {
-            "import": "./esm/util.js",
-            "require": "./lib/util.js"
-        },
-        "./hook": {
-            "import": "./esm/hook.js",
-            "require": "./lib/hook.js"
-        }
-    },
-    "buildOpts": {
-        "formats": [
-            "esm",
-            "cjs"
-        ],
-        "entries": [
-            "index.tsx",
-            "util.ts",
-            "hook.tsx",
-            "context.ts"
-        ],
-        "varName": "FormRelation"
-    },
-    "type": "module",
-    "publishConfig": {
-        "registry": "https://registry.npmjs.org/",
-        "access": "public"
-    },
-    "scripts": {
-        "test": "echo \"Error: run tests from root\" && exit 1",
-        "build": "rollup --config ./rollup.config.js",
-        "i": "npm i"
-    },
-    "peerDependencies": {
-        "@types/antd": ">=1.0.0",
-        "@types/lodash": ">=4.14.200",
-        "@types/react": ">=18.0.28",
-        "antd": ">=5.0.0",
-        "loadsh": ">=0.0.4",
-        "react": ">=18.0.0",
-        "react-use": ">=17.4.0"
-    },
-    "gitHead": "f99129b7c7a2d067747d411044dea026a22ca87a",
-    "types": "./lib/index.d.ts"
+    "entries": [
+      "index.tsx",
+      "util.ts",
+      "hook.tsx",
+      "context.ts"
+    ],
+    "varName": "FormRelation"
+  },
+  "type": "module",
+  "publishConfig": {
+    "registry": "https://registry.npmjs.org/",
+    "access": "public"
+  },
+  "scripts": {
+    "test": "echo \"Error: run tests from root\" && exit 1",
+    "build": "rollup --config ./rollup.config.js",
+    "i": "npm i"
+  },
+  "peerDependencies": {
+    "@types/antd": ">=1.0.0",
+    "@types/lodash": ">=4.14.200",
+    "@types/react": ">=18.0.28",
+    "antd": ">=5.0.0",
+    "loadsh": ">=0.0.4",
+    "react": ">=18.0.0",
+    "react-use": ">=17.4.0"
+  },
+  "types": "./lib/index.d.ts",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Peng-YT/react-component.git"
+  },
+  "bugs": {
+    "url": "https://github.com/Peng-YT/react-component/issues"
+  }
 }
