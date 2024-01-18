@@ -6,13 +6,16 @@ import postcss from 'rollup-plugin-postcss'
 import { createRequire } from 'module'
 const __dirname = dirname(fileURLToPath(import.meta.url))
 const require = createRequire(import.meta.url)
-const pkg = require('./package.json')
+const cwd = process.cwd()
+const pkg = require(resolve(cwd, './package.json'))
+const tsconfigOpts = require(resolve(__dirname, './tsconfig.json'))
 const formats = pkg.buildOpts.formats
-const outputDirs = pkg.files
+const outputDirs = pkg.files || []
 const entriesFileName = pkg.buildOpts.entries
 const external = Object.keys({
     ...pkg.dependencies,
-    ...pkg.devDpendencies
+    ...pkg.devDpendencies,
+    ...pkg.peerDependencies
 })
 const removeAfterfix = (fileName: string) => {
     const paths = fileName.split('.')
@@ -27,7 +30,12 @@ const getOpts = (format: ModuleFormat, ouputDir: string): RollupOptions => {
     const isBrowser = format === 'iife'
     const plugins = [
         typescript({
-            tsconfig: './tsconfig.json',
+            cwd,
+            tsconfigOverride: {
+                ...tsconfigOpts,
+                include: [`${cwd}/src/**/*`],
+                baseUrl: './',
+            },
         }),
         postcss({
             extract: 'css/index.css',

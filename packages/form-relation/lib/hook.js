@@ -1,25 +1,28 @@
 'use strict';
 
-var context = require('./context-d4e5c342.js');
-var util = require('./util-848317dc.js');
-require('./_commonjsHelpers-22a5398b.js');
+var React = require('react');
+var context = require('./context.js');
+var util = require('./util-942300a6.js');
 
 const useRelation = (props) => {
-    const name = context.reactExports.useContext(context.NameContext);
-    const relationInfo = context.reactExports.useContext(context.RelationInfoContext);
-    const form = context.reactExports.useContext(context.FormInstanceContext);
-    const otherFormData = context.reactExports.useContext(context.OtherFormDataContext);
+    const name = React.useContext(context.NameContext);
+    const relationInfo = React.useContext(context.RelationInfoContext);
+    const formData = React.useContext(context.FormDataContext);
+    const otherFormData = React.useContext(context.OtherFormDataContext);
     // const triggerRelation = useContext(TriggerRelationContext)
-    const matchController = context.reactExports.useMemo(() => util.getMatchRelationResByFormData(relationInfo, form?.getFieldsValue(true) || {}, otherFormData), [relationInfo, form?.getFieldsValue(true), otherFormData]);
-    const relationDetail = context.reactExports.useMemo(() => {
-        const allRealtion = matchController.reduce((prev, cur) => {
+    const matchController = React.useMemo(() => util.getMatchRelationResByFormData(relationInfo, {
+        ...(otherFormData || {}),
+        ...(formData || {}),
+    }), [relationInfo, formData, otherFormData]);
+    const relationDetail = React.useMemo(() => {
+        const allRelation = matchController.reduce((prev, cur) => {
             return util.mergeRelation(prev, cur.relation);
         }, {});
         if (Array.isArray(name)) {
-            return Object.values(allRealtion).find(item => item && item.keyPath && util.cpmNamePath(item.keyPath, name));
+            return Object.values(allRelation).find(item => item && item.keyPath && util.cpmNamePath(item.keyPath, name));
         }
         else {
-            return allRealtion[name];
+            return allRelation[name];
         }
     }, [matchController, name]);
     return {

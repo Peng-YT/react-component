@@ -13,7 +13,7 @@ export declare const FormValidateInfoContext: import("react").Context<{
     };
 }>;
 export declare const TriggerRelationContext: import("react").Context<boolean>;
-export declare const NameContext: import("react").Context<NamePath>;
+export declare const NameContext: import("react").Context<any>;
 export declare const OtherPropsContext: import("react").Context<{
     onVisibleChange?: (visible: boolean, name: NamePath) => any;
 }>;

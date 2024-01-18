@@ -89,9 +89,12 @@ export const isMatch = (value1, value2) => {
     return value1 === value2
 }
 // 判断表单值是否匹配到了某个联动关系的条件
-export const formValueIsMatchInCondition = (formValue, conditionVal, formData) => {
+export const formValueIsMatchInCondition = (formValue, conditionVal, formData, { prevVal, prevFormData }) => {
     if (typeof conditionVal === 'function') {
-        return conditionVal(formValue, formData)
+        return conditionVal(formValue, formData, {
+            prevVal,
+            prevFormData,
+        })
     }
     return isMatch(formValue, conditionVal)
 }
@@ -100,34 +103,35 @@ export const formValueIsMatchInCondition = (formValue, conditionVal, formData) =
 export function isMatchCondition<Info>(
     conditions: FormRelationType<Info>['conditions'],
     matchRule: 'OR' | 'AND' = 'AND',
-    formData: Record<string, any>,
-    otherFormData?: Record<string, any> | null,
+    formData: Info,
+    props: {
+        oldFormData: Info
+    },
 ): boolean {
     if (conditions === 'default') {
         return true
     }
     if (!Array.isArray(conditions)) {
-        return conditions.result({
-            ...(otherFormData || {}),
-            ...formData,
-        } as Info)
+        return conditions.result(
+            {
+                ...formData,
+            },
+            props.oldFormData,
+        )
     }
     const matchFn = matchRule === 'AND' ? conditions.every : conditions.some
     return matchFn.call(conditions, (condition) => {
-        let formValue: any
-        if (otherFormData) {
-            formValue = hasProp(formData, condition.key)
-                ? getObjVal(formData, condition.key)
-                : getObjVal(otherFormData, condition.key)
-        } else {
-            formValue = getObjVal(formData, condition.key)
-        }
+        const formValue = getObjVal(formData, condition.key)
+        const prevFormValue = getObjVal(props.oldFormData, condition.key)
         const isMatch = formValueIsMatchInCondition(
             formValue,
             condition.value,
             {
-                ...(otherFormData || {}),
                 ...formData,
+            },
+            {
+                prevFormData: props.oldFormData,
+                prevVal: prevFormValue,
             },
         )
         if (isMatch && condition.conditions) {
@@ -135,7 +139,7 @@ export function isMatchCondition<Info>(
                 condition.conditions,
                 condition.matchRule,
                 formData,
-                otherFormData,
+                props,
             )
         }
         return isMatch
@@ -146,13 +150,16 @@ export function and<Info extends any>(
 ): FormRelationOpResType<Info> {
     return {
         isOpRes: true,
-        result: (info: Info) => {
+        result: (info: Info, prevInfo: Info) => {
             return params.reduce((prev, cur) => {
                 return (
                     isMatchCondition<Info>(
                         cur === 'default' || cur.isOpRes ? cur : [cur],
                         'AND',
-                        info as Record<string, any>,
+                        info,
+                        {
+                            oldFormData: prevInfo,
+                        },
                     ) && prev
                 )
             }, true)
@@ -164,13 +171,16 @@ export function or<Info extends any>(
 ): FormRelationOpResType<Info> {
     return {
         isOpRes: true,
-        result: (info: Info) => {
+        result: (info: Info,  prevInfo: Info) => {
             const res = params.reduce((prev, cur) => {
                 return (
                     isMatchCondition<Info>(
                         cur === 'default' || cur.isOpRes ? cur : [cur],
                         'OR',
-                        info as Record<string, any>,
+                        info,
+                        {
+                            oldFormData: prevInfo,
+                        },
                     ) || prev
                 )
             }, false)
@@ -181,8 +191,10 @@ export function or<Info extends any>(
 /** 根据表单值，获取条件匹配的表单联动关系信息 */
 export function getMatchRelationResByFormData<Info extends object>(
     relationInfoList: FormRelationType<Info>[],
-    formData: Partial<Record<keyof Info, any>>,
-    otherFormData?: Partial<Record<keyof Info, any>> | null,
+    formData: Info,
+    props?: {
+        oldFormData?: Info
+    },
 ) {
     return relationInfoList
         .filter((item) => {
@@ -190,7 +202,9 @@ export function getMatchRelationResByFormData<Info extends object>(
                 item.conditions,
                 item.matchRule,
                 formData,
-                otherFormData,
+                {
+                    oldFormData: props?.oldFormData || {} as Info,
+                }
             )
         })
         .sort((a, b) => (a.weight || 0) - (b.weight || 0))
@@ -387,9 +401,14 @@ export function mergeRelation<Info extends object>(
  */
 export function getCondition<Info extends object>(
     relationInfoList: FormRelationType<Info>[],
-    formData: Partial<Record<keyof Info, any>>,
+    formData: Info,
+    props?: {
+        oldFormData?: Info
+    },
 ): Partial<Record<keyof Info, FormRelationDetailType>> {
-    return getMatchRelationResByFormData(relationInfoList, formData).reduce(
+    return getMatchRelationResByFormData<Info>(relationInfoList, formData, {
+        oldFormData: props?.oldFormData || {} as Info,
+    }).reduce(
         (prev, cur) => {
             return mergeRelation<Info>(prev, cur.relation)
         },
@@ -516,6 +535,16 @@ export const cpmNamePath = (name1: any[], name2: any[]) => {
         return item === name2[index]
     })
 }
+export const isEqualName = (name1: NamePath, name2: NamePath) => {
+    if (Array.isArray(name1) && Array.isArray(name2)) {
+        return cpmNamePath(name1, name2)
+    }
+    const name1Res =
+        Array.isArray(name1) && name1.length === 1 ? name1[0] : name1
+    const name2Res =
+        Array.isArray(name2) && name2.length === 1 ? name2[0] : name2
+    return name1Res === name2Res
+}
 export const cmpArray = (
     match1: FormRelationType<any>[],
     match2: FormRelationType<any>[],
@@ -542,18 +571,22 @@ export const cmpArray = (
  */
 export function initRelationValue<Info extends object>(
     relationInfo: FormRelationType<Info>[],
-    pendingFormValues: Partial<Record<keyof Info, any>>,
+    pendingFormValues: Info,
     prevEffectValues: Partial<Record<keyof Info, any>>,
     needTriggerReset = true,
     props?: {
         recoverData?: Record<string, any>
-        oldFormValues?: Partial<Record<keyof Info, any>>
+        oldFormValues?: Info
         triggerChangeKey?: NamePath
     },
 ): Partial<Record<keyof Info, any>> {
-    const match = getMatchRelationResByFormData(relationInfo, pendingFormValues)
+    const match = getMatchRelationResByFormData<Info>(relationInfo, pendingFormValues, {
+        oldFormData: props?.oldFormValues || {} as Info,
+    },)
     const oldMatch = props?.oldFormValues
-        ? getMatchRelationResByFormData(relationInfo, props?.oldFormValues)
+        ? getMatchRelationResByFormData<Info>(relationInfo, props?.oldFormValues, {
+            oldFormData: props?.oldFormValues || {} as Info,
+        },)
         : undefined
 
     const relation: AllRelationType<Info> = match.reduce(
@@ -570,10 +603,21 @@ export function initRelationValue<Info extends object>(
             if (isDefaultOrNewCondition && needTriggerReset) {
                 // eslint-disable-next-line no-restricted-syntax, guard-for-in
                 for (const prop in curRelation) {
+                    const curRelationDetail = curRelation[prop]
+                    /** 如果联动是由该字段引起的，则该字段无需做值重置，避免循环 */
+                    const name =
+                        curRelationDetail && curRelationDetail?.keyPath
+                            ? curRelationDetail.keyPath
+                            : prop
+                    const isTriggerTarget = props?.triggerChangeKey
+                        ? isEqualName(name, props?.triggerChangeKey)
+                        : false
+                    if (isTriggerTarget) {
+                        continue
+                    }
                     const valueIsEmpty =
                         !hasProp(pendingFormValues, prop) ||
                         pendingFormValues[prop] === undefined
-                    const curRelationDetail = curRelation[prop]
                     const needResetWhenOnlyEmpty = // 仅值为空时才进行值的重置
                         curRelationDetail === false ||
                         (curRelationDetail?.needResetWhenOnlyEmpty ?? true)
@@ -611,7 +655,9 @@ export function initRelationValue<Info extends object>(
         {},
     ) as Partial<Record<keyof Info, any>>
 
-    const nextMatch = getMatchRelationResByFormData(relationInfo, newFormValues)
+    const nextMatch = getMatchRelationResByFormData(relationInfo, newFormValues, {
+        oldFormData: props?.oldFormValues || {},
+    })
     const equalMatch = cmpArray(match, nextMatch)
     let allEffectRes = assignDeep(
         prevEffectValues,
@@ -645,6 +691,9 @@ export function initRelationValue<Info extends object>(
     const matchWithRecoverProp = getMatchRelationResByFormData(
         relationInfo,
         formValuesWithRecoverProp,
+        {
+            oldFormData: props?.oldFormValues || {},
+        },
     )
     /* 加入恢复值之后的表单联动关系的具体值，用于下面计算effectValuesWithRecoverProp */
     const relationWithRecoverProp: AllRelationType<Info> =

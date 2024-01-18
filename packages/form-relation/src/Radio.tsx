@@ -12,13 +12,14 @@ import { Radio, Tooltip } from 'antd'
 import type { RadioButtonProps } from 'antd/es/radio/radioButton'
 import React from 'react'
 import { useRelation } from './hook'
+import { RadioRef } from 'antd/es/radio'
 
 const { Button, Group } = Radio
 
 function RadioComponent({
     children,
     ...props
-}: RadioProps & React.RefAttributes<HTMLElement>) {
+}: RadioProps & React.RefAttributes<RadioRef>) {
     const { optionIsHide, optionIsDisabled } = useRelation(props)
     return optionIsHide ? null : (
         <Radio {...props} disabled={optionIsDisabled}>
@@ -52,7 +53,7 @@ function ButtonComponent({
             {desc ? (
                 <Tooltip overlay={desc}>
                     &nbsp;
-                    <InfoCircleOutlined></InfoCircleOutlined>
+                    <InfoCircleOutlined rev={undefined}></InfoCircleOutlined>
                 </Tooltip>
             ) : null}
         </Button>

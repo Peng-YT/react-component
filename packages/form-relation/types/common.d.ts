@@ -1,9 +1,29 @@
+/*
+ * @Author: 彭越腾
+ * @Date: 2023-11-23 11:07:15
+ * @LastEditors: 彭越腾
+ * @LastEditTime: 2023-11-23 13:31:31
+ * @FilePath: \react-component\packages\form-relation\types\common.d.ts
+ * @Description: https://github.com/OBKoro1/koro1FileHeader/wiki/%E9%85%8D%E7%BD%AE
+ */
 type DeepArrayType<A1, A2> = A1 | [...A1, ...A2]
 type KeyPath<Info = any> = string[]
 export type FormRelationControllerType<Info = any> =
     | {
         key: keyof Info | KeyPath<Info>
-        value: any | ((curVal: any, formData: Info) => boolean)
+        value:
+              | string
+              | number
+              | Array<any>
+              | object
+              | ((
+                    curVal: any,
+                    formData: Info,
+                    props: {
+                        prevVal: any
+                        prevFormData: Info
+                    },
+                ) => boolean)
         conditions?: FormRelationControllerType<Info>
         matchRule?: 'AND' | 'OR'
         readonly isOpRes?: false
@@ -56,7 +76,7 @@ export type FormRelationDetailType<Info = any> =
         noRecoverValue?: boolean
     }
 export interface FormRelationOpResType<Info = any> {
-    result: (info: Info) => boolean
+    result: (info: Info, prevInfo: Info) => boolean
     isOpRes: true
 }
 export type FormRelationOpParamType<Info = any> = (

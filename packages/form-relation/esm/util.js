@@ -84,40 +84,37 @@ const isMatch = (value1, value2) => {
     return value1 === value2;
 };
 // 判断表单值是否匹配到了某个联动关系的条件
-const formValueIsMatchInCondition = (formValue, conditionVal, formData) => {
+const formValueIsMatchInCondition = (formValue, conditionVal, formData, { prevVal, prevFormData }) => {
     if (typeof conditionVal === 'function') {
-        return conditionVal(formValue, formData);
+        return conditionVal(formValue, formData, {
+            prevVal,
+            prevFormData,
+        });
     }
     return isMatch(formValue, conditionVal);
 };
 // 是否匹配到了这个条件
-function isMatchCondition(conditions, matchRule = 'AND', formData, otherFormData) {
+function isMatchCondition(conditions, matchRule = 'AND', formData, props) {
     if (conditions === 'default') {
         return true;
     }
     if (!Array.isArray(conditions)) {
         return conditions.result({
-            ...(otherFormData || {}),
             ...formData,
-        });
+        }, props.oldFormData);
     }
     const matchFn = matchRule === 'AND' ? conditions.every : conditions.some;
     return matchFn.call(conditions, (condition) => {
-        let formValue;
-        if (otherFormData) {
-            formValue = hasProp(formData, condition.key)
-                ? getObjVal(formData, condition.key)
-                : getObjVal(otherFormData, condition.key);
-        }
-        else {
-            formValue = getObjVal(formData, condition.key);
-        }
+        const formValue = getObjVal(formData, condition.key);
+        const prevFormValue = getObjVal(props.oldFormData, condition.key);
         const isMatch = formValueIsMatchInCondition(formValue, condition.value, {
-            ...(otherFormData || {}),
             ...formData,
+        }, {
+            prevFormData: props.oldFormData,
+            prevVal: prevFormValue,
         });
         if (isMatch && condition.conditions) {
-            return isMatchCondition(condition.conditions, condition.matchRule, formData, otherFormData);
+            return isMatchCondition(condition.conditions, condition.matchRule, formData, props);
         }
         return isMatch;
     });
@@ -125,9 +122,11 @@ function isMatchCondition(conditions, matchRule = 'AND', formData, otherFormData
 function and(params) {
     return {
         isOpRes: true,
-        result: (info) => {
+        result: (info, prevInfo) => {
             return params.reduce((prev, cur) => {
-                return (isMatchCondition(cur === 'default' || cur.isOpRes ? cur : [cur], 'AND', info) && prev);
+                return (isMatchCondition(cur === 'default' || cur.isOpRes ? cur : [cur], 'AND', info, {
+                    oldFormData: prevInfo,
+                }) && prev);
             }, true);
         },
     };
@@ -135,19 +134,23 @@ function and(params) {
 function or(params) {
     return {
         isOpRes: true,
-        result: (info) => {
+        result: (info, prevInfo) => {
             const res = params.reduce((prev, cur) => {
-                return (isMatchCondition(cur === 'default' || cur.isOpRes ? cur : [cur], 'OR', info) || prev);
+                return (isMatchCondition(cur === 'default' || cur.isOpRes ? cur : [cur], 'OR', info, {
+                    oldFormData: prevInfo,
+                }) || prev);
             }, false);
             return res;
         },
     };
 }
 /** 根据表单值，获取条件匹配的表单联动关系信息 */
-function getMatchRelationResByFormData(relationInfoList, formData, otherFormData) {
+function getMatchRelationResByFormData(relationInfoList, formData, props) {
     return relationInfoList
         .filter((item) => {
-        return isMatchCondition(item.conditions, item.matchRule, formData, otherFormData);
+        return isMatchCondition(item.conditions, item.matchRule, formData, {
+            oldFormData: props?.oldFormData || {},
+        });
     })
         .sort((a, b) => (a.weight || 0) - (b.weight || 0));
 }
@@ -288,8 +291,10 @@ function mergeRelation(prevRelation, nextRelation) {
  * @param formData 表单校验依赖的数据，需要传入哪些数据，根据传入的relationInfoList的类型决定 如果relationInfoList的ts类型为 FormRelationTypeFormRelationType(Dep)[]  那么formData就需要传入Dep类型的数据
  * @returns
  */
-function getCondition(relationInfoList, formData) {
-    return getMatchRelationResByFormData(relationInfoList, formData).reduce((prev, cur) => {
+function getCondition(relationInfoList, formData, props) {
+    return getMatchRelationResByFormData(relationInfoList, formData, {
+        oldFormData: props?.oldFormData || {},
+    }).reduce((prev, cur) => {
         return mergeRelation(prev, cur.relation);
     }, {});
 }
@@ -392,6 +397,14 @@ const cpmNamePath = (name1, name2) => {
         return item === name2[index];
     });
 };
+const isEqualName = (name1, name2) => {
+    if (Array.isArray(name1) && Array.isArray(name2)) {
+        return cpmNamePath(name1, name2);
+    }
+    const name1Res = Array.isArray(name1) && name1.length === 1 ? name1[0] : name1;
+    const name2Res = Array.isArray(name2) && name2.length === 1 ? name2[0] : name2;
+    return name1Res === name2Res;
+};
 const cmpArray = (match1, match2) => {
     if (match1.length !== match2.length) {
         return false;
@@ -413,9 +426,13 @@ const cmpArray = (match1, match2) => {
  * @returns 表单变化的值
  */
 function initRelationValue(relationInfo, pendingFormValues, prevEffectValues, needTriggerReset = true, props) {
-    const match = getMatchRelationResByFormData(relationInfo, pendingFormValues);
+    const match = getMatchRelationResByFormData(relationInfo, pendingFormValues, {
+        oldFormData: props?.oldFormValues || {},
+    });
     const oldMatch = props?.oldFormValues
-        ? getMatchRelationResByFormData(relationInfo, props?.oldFormValues)
+        ? getMatchRelationResByFormData(relationInfo, props?.oldFormValues, {
+            oldFormData: props?.oldFormValues || {},
+        })
         : undefined;
     const relation = match.reduce((prev, cur) => {
         /** 该条件是默认触发的，或者旧的表单没有满足该条件，但新的表单满足了该条件，则证明该条件是新达成的 */
@@ -429,9 +446,19 @@ function initRelationValue(relationInfo, pendingFormValues, prevEffectValues, ne
         if (isDefaultOrNewCondition && needTriggerReset) {
             // eslint-disable-next-line no-restricted-syntax, guard-for-in
             for (const prop in curRelation) {
+                const curRelationDetail = curRelation[prop];
+                /** 如果联动是由该字段引起的，则该字段无需做值重置，避免循环 */
+                const name = curRelationDetail && curRelationDetail?.keyPath
+                    ? curRelationDetail.keyPath
+                    : prop;
+                const isTriggerTarget = props?.triggerChangeKey
+                    ? isEqualName(name, props?.triggerChangeKey)
+                    : false;
+                if (isTriggerTarget) {
+                    continue;
+                }
                 const valueIsEmpty = !hasProp(pendingFormValues, prop) ||
                     pendingFormValues[prop] === undefined;
-                const curRelationDetail = curRelation[prop];
                 const needResetWhenOnlyEmpty = // 仅值为空时才进行值的重置
                  curRelationDetail === false ||
                     (curRelationDetail?.needResetWhenOnlyEmpty ?? true);
@@ -459,7 +486,9 @@ function initRelationValue(relationInfo, pendingFormValues, prevEffectValues, ne
     }, {});
     const effectValues = getValuesFromRelation(relation, pendingFormValues);
     const newFormValues = assignDeep(pendingFormValues, effectValues, {});
-    const nextMatch = getMatchRelationResByFormData(relationInfo, newFormValues);
+    const nextMatch = getMatchRelationResByFormData(relationInfo, newFormValues, {
+        oldFormData: props?.oldFormValues || {},
+    });
     const equalMatch = cmpArray(match, nextMatch);
     let allEffectRes = assignDeep(prevEffectValues, effectValues, {});
     if (!equalMatch) {
@@ -470,7 +499,9 @@ function initRelationValue(relationInfo, pendingFormValues, prevEffectValues, ne
     /* 加入恢复值之后的表单数据 */
     const formValuesWithRecoverProp = assignDeep(finalResBeforeRecoverProp, props?.recoverData || {}, {});
     /* 加入恢复值之后的表单联动关系，用于下面计算effectValuesWithRecoverProp */
-    const matchWithRecoverProp = getMatchRelationResByFormData(relationInfo, formValuesWithRecoverProp);
+    const matchWithRecoverProp = getMatchRelationResByFormData(relationInfo, formValuesWithRecoverProp, {
+        oldFormData: props?.oldFormValues || {},
+    });
     /* 加入恢复值之后的表单联动关系的具体值，用于下面计算effectValuesWithRecoverProp */
     const relationWithRecoverProp = matchWithRecoverProp.reduce((prev, cur) => {
         const curRelation = {
@@ -501,4 +532,4 @@ function initRelationValue(relationInfo, pendingFormValues, prevEffectValues, ne
     }
 }
 
-export { and, assignDeep, cmpArray, cpmNamePath, formValueIsMatchInCondition, getCondition, getFieldIsOpen, getMatchRelationResByFormData, getObjVal, getValuesFromRelation, hasProp, initRelationValue, isDisabled, isMatch, isMatchCondition, mergeRelation, optionIsDisabled, optionIsHide, or, validateFromRelationInfo };
+export { and, assignDeep, cmpArray, cpmNamePath, formValueIsMatchInCondition, getCondition, getFieldIsOpen, getMatchRelationResByFormData, getObjVal, getValuesFromRelation, hasProp, initRelationValue, isDisabled, isEqualName, isMatch, isMatchCondition, mergeRelation, optionIsDisabled, optionIsHide, or, validateFromRelationInfo };

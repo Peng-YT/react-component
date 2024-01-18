@@ -10,7 +10,7 @@
 import { InfoCircleOutlined } from '@ant-design/icons'
 import type { CheckboxProps } from 'antd'
 import { Checkbox, Tooltip } from 'antd'
-import type { CheckboxGroupProps } from 'antd/es/checkbox'
+import type { CheckboxGroupProps, CheckboxRef } from 'antd/es/checkbox'
 import React from 'react'
 import { useRelation } from './hook'
 
@@ -21,7 +21,7 @@ function CheckboxComponent({
     desc,
     ...props
 }: CheckboxProps &
-    React.RefAttributes<HTMLInputElement> & { desc?: JSX.Element | string }) {
+    React.RefAttributes<CheckboxRef> & { desc?: JSX.Element | string }) {
     const { optionIsHide, optionIsDisabled } = useRelation(props)
     return optionIsHide ? null : (
         <Checkbox {...props} disabled={optionIsDisabled}>
@@ -30,7 +30,7 @@ function CheckboxComponent({
                 <div>
                     <Tooltip overlay={desc} style={{ width: 'auto' }}>
                         &nbsp;
-                        <InfoCircleOutlined></InfoCircleOutlined>
+                        <InfoCircleOutlined rev={undefined}></InfoCircleOutlined>
                     </Tooltip>
                 </div>
             ) : null}

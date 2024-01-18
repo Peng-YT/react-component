@@ -82,6 +82,7 @@ function DraggableSelect<VT extends SelectValue = SelectValue>({
                                     padding: '4',
                                 }}
                                 onClick={onClose}
+                                rev={undefined}
                             ></CloseOutlined>
                         ) : (
                             ''

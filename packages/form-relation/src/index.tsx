@@ -2,10 +2,10 @@
 /*
  * @Author: 彭越腾
  * @Date: 2021-08-16 17:33:33
- * @LastEditTime: 2023-10-20 17:33:08
+ * @LastEditTime: 2023-11-28 15:02:00
  * @LastEditors: 彭越腾
  * @Description: 能控制各个字段之间联动的表单
- * @FilePath: \admin-market\src\components\Common\RelationForm\Index.tsx
+ * @FilePath: \react-component\packages\form-relation\src\index.tsx
  */
 
 import type { FormInstance, FormItemProps, FormProps } from 'antd'
@@ -48,8 +48,13 @@ function ItemComponent<Values = any>({
     const otherProps = useContext(OtherPropsContext)
     const matchController = getMatchRelationResByFormData(
         relationInfo,
-        formData || {},
-        otherFormData,
+        {
+            ...(formData || {}),
+            ...(otherFormData || {}),
+        },
+        {
+            oldFormData: {},
+        },
     )
     const allRelation = matchController.reduce((prev, cur) => {
         return {
@@ -97,7 +102,7 @@ function ItemComponent<Values = any>({
         }
         const relationDetail = Array.isArray(name)
             ? findRelationDetailFromKeyPath(name)
-            : allRelation[name]
+            : allRelation[name as string]
         if (relationDetail === undefined || relationDetail === null) {
             return true
         }
@@ -348,7 +353,7 @@ function FormComponent<Values = any>({
             run()
         },
         200,
-        [originFormData, otherFormData],
+        [originFormData, otherFormData, relationInfo],
     )
 
     return (

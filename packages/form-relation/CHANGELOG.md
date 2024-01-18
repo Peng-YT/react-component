@@ -3,6 +3,29 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [3.1.3](https://github.com/Peng-YT/react-component/compare/v3.1.2...v3.1.3) (2023-11-28)
+
+
+### Features
+
+* 微调 ([0af01af](https://github.com/Peng-YT/react-component/commit/0af01af1126911affb03d96bcb8763ed0adc032b))
+
+
+
+
+
+## [3.1.2](https://github.com/Peng-YT/react-component/compare/v3.1.1...v3.1.2) (2023-11-23)
+
+
+### Features
+
+* **form-relation:** condition的value回调新增prevFormData参数 ([da4cd79](https://github.com/Peng-YT/react-component/commit/da4cd79b99975aee5db96ea2f5d88c0dd21e722d))
+
+
+
+
+
+
 ## [3.1.1](https://github.com/Peng-YT/react-component/compare/v3.1.0...v3.1.1) (2023-11-21)
 
 **Note:** Version bump only for package @ppeng/form-relation

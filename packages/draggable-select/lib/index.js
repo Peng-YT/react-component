@@ -54,7 +54,7 @@ function DraggableSelect({ children, ...props }) {
                     marginRight: 4,
                     color: '#00000073',
                     padding: '4',
-                }, onClick: onClose })) : ('')))));
+                }, onClick: onClose, rev: undefined })) : ('')))));
     };
     useEffect(() => {
         setValue(props.value);
