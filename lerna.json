@@ -2,5 +2,10 @@
   "packages": [
     "packages/*"
   ],
-  "version": "3.1.3"
+  "version": "independent",
+  "ignoreChanges": [
+    "**/__tests__/**",
+    "**/__fixtures__/**",
+    "**.md"
+  ]
 }

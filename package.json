@@ -8,9 +8,9 @@
     "test": "echo \"Error: no test specified\" && exit 1",
     "build": "node buildScript && lerna run build",
     "commit": "git add . && git-cz",
-    "publish-001": "npm run commit && lerna version patch --conventional-commits && lerna publish from-git",
-    "publish-010": "npm run commit && lerna version minor --conventional-commits && lerna publish from-git",
-    "publish-100": "npm run commit && lerna version major --conventional-commits && lerna publish from-git"
+    "publish-only": "lerna publish from-package",
+    "publish": "npm run build && npm run commit && lerna version && npm run publish-only",
+    "version": "node ./script/createChangelog.mjs && git add ."
   },
   "author": "pengyueteng",
   "license": "ISC",

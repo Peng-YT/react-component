@@ -1,3 +1,11 @@
+/*
+ * @Author: 彭越腾
+ * @Date: 2023-11-23 11:07:15
+ * @LastEditors: 彭越腾
+ * @LastEditTime: 2024-03-18 18:44:48
+ * @FilePath: \react-component\buildOpts.ts
+ * @Description: https://github.com/OBKoro1/koro1FileHeader/wiki/%E9%85%8D%E7%BD%AE
+ */
 import { RollupOptions, ModuleFormat } from 'rollup'
 import { fileURLToPath } from 'url'
 import { dirname, resolve } from 'path'
@@ -10,7 +18,7 @@ const cwd = process.cwd()
 const pkg = require(resolve(cwd, './package.json'))
 const tsconfigOpts = require(resolve(__dirname, './tsconfig.json'))
 const formats = pkg.buildOpts.formats
-const outputDirs = pkg.files || []
+const outputDirs = pkg.buildOpts.outputDirs || pkg.files || []
 const entriesFileName = pkg.buildOpts.entries
 const external = Object.keys({
     ...pkg.dependencies,
@@ -22,12 +30,12 @@ const removeAfterfix = (fileName: string) => {
     const afterfix = paths[paths.length - 1]
     return fileName.slice(0, -afterfix.length - 1)
 }
-const getPkgName = () => {
+/* const getPkgName = () => {
     const paths = pkg.name.split('/')
     return paths[paths.length - 1]
-}
-const getOpts = (format: ModuleFormat, ouputDir: string): RollupOptions => {
-    const isBrowser = format === 'iife'
+} */
+const getOpts = (format: ModuleFormat, outputDir: string): RollupOptions => {
+    const isBrowser = format === 'iife' || format === 'amd' || format || 'umd'
     const plugins = [
         typescript({
             cwd,
@@ -50,7 +58,7 @@ const getOpts = (format: ModuleFormat, ouputDir: string): RollupOptions => {
         external: isBrowser ? undefined : external,
         output: isBrowser ? {
             format,
-            dir: ouputDir,
+            dir: outputDir,
             name: pkg.buildOpts.varName,
         } : {
             entryFileNames: '[name].js',
@@ -60,7 +68,7 @@ const getOpts = (format: ModuleFormat, ouputDir: string): RollupOptions => {
                     return 'vendor'
                 }
             }, */
-            dir: ouputDir
+            dir: outputDir
         },
         treeshake: false,
         plugins,
