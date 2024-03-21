@@ -6,11 +6,11 @@
   "type": "module",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "build": "node ./script/buildScript",
+    "build": "node ./scripts/buildScript",
     "commit": "git add . && git-cz",
     "publish-only": "lerna publish from-package",
     "publish": "npm run build && npm run commit && lerna version && npm run publish-only",
-    "version": "node ./script/createChangelog.mjs && git add ."
+    "version": "node ./scripts/createChangelog.mjs && git add ."
   },
   "author": "pengyueteng",
   "license": "ISC",
