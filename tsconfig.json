@@ -1,5 +1,4 @@
 {
-    "include": ["packages/**/*"],
     "exclude": ["node_modules"],
     "compilerOptions": {
         "module": "esnext",
