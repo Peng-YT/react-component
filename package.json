@@ -45,14 +45,11 @@
   "husky": {
     "hooks": {
       "pre-commit": "lint-staged",
-      "commit-msg": "commitlint -E HUSKY_GIT_PARAMS"
+      "commit-msg": "commitlint -E HUSKY_GIT_PARAMS --config commitlint.config.js"
     }
   },
   "lint-staged": {
-    "*.{js,ts}": [
-      "./scripts/commitMsgCheck.js",
-      "git add"
-    ]
+    "*.{js,ts}": []
   },
   "engines": {
     "node": ">=16.0.0"
