@@ -50,7 +50,7 @@
   },
   "lint-staged": {
     "*.{js,ts}": [
-      "./scripts/commitMsgCheck.js",
+      "./scri131pts/commitMsgCheck.js",
       "git add"
     ]
   },
