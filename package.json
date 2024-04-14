@@ -15,6 +15,8 @@
   "author": "pengyueteng",
   "license": "ISC",
   "devDependencies": {
+    "@commitlint/cli": "^19.2.1",
+    "@commitlint/config-conventional": "^19.1.0",
     "@rollup/plugin-commonjs": "^24.0.1",
     "@rollup/plugin-node-resolve": "^15.0.1",
     "@rollup/plugin-typescript": "^11.1.5",
@@ -24,7 +26,9 @@
     "commitizen": "^4.3.0",
     "conventional-changelog-cli": "^2.2.2",
     "cz-conventional-changelog": "^3.3.0",
+    "husky": "^9.0.11",
     "lerna": "^4.0.0",
+    "lint-staged": "^15.2.2",
     "rimraf": "^4.1.2",
     "rollup": ">=3.15.0",
     "rollup-plugin-postcss": ">=4.0.2",
@@ -40,6 +44,7 @@
   },
   "husky": {
     "hooks": {
+      "pre-commit": "lint-staged",
       "commit-msg": "commitlint -E HUSKY_GIT_PARAMS"
     }
   },
