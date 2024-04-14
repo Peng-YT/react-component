@@ -11,8 +11,8 @@
     "publish-only": "lerna publish from-package",
     "publish": "npm run build && npm run commit && lerna version && npm run publish-only",
     "version": "node ./scripts/createChangelog.mjs && git add .",
-    "commitlint": "commitlint --edit $1",
-    "prepare": "husky && echo \"npm run commitlint\" > .husky/pre-commit"
+    "commitlint": "commitlint --edit $1 --config commitlint.config.mjs",
+    "prepare": "husky && echo \"npm run commitlint\" > .husky/commit-msg"
   },
   "author": "pengyueteng",
   "license": "ISC",

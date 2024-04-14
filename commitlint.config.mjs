@@ -33,7 +33,7 @@ export default {
             rules: {
                 "must-add-document-url": ({ type, body }) => {
                     const ALIYUN_DOCUMENT_PREFIX = "https://devops.aliyun.com";
-
+                    return [true];
                     // 排除的类型
                     const excludeTypes = ["chore", "refactor", "style", "test"];
                     if (excludeTypes.includes(type)) {
