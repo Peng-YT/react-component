@@ -12,7 +12,7 @@
     "publish": "npm run build && npm run commit && lerna version && npm run publish-only",
     "version": "node ./scripts/createChangelog.mjs && git add .",
     "commitlint": "commitlint -e -V --config commitlint.config.mjs",
-    "prepare": "husky install"
+    "prepare": "npx husky init"
   },
   "author": "pengyueteng",
   "license": "ISC",
@@ -28,8 +28,8 @@
     "commitizen": "^4.3.0",
     "conventional-changelog-cli": "^2.2.2",
     "cz-conventional-changelog": "^3.3.0",
-    "husky": "^4.0.0",
-    "lerna": "^4.0.0",
+    "husky": "^4.3.8",
+    "lerna": "^8.1.2",
     "lint-staged": "^15.2.2",
     "rimraf": "^4.1.2",
     "rollup": ">=3.15.0",
