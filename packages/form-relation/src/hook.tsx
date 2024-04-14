@@ -6,7 +6,7 @@
  * @Description: In User Settings Edit
  * @FilePath: \react-component\packages\form-relation\src\hook.tsx
  */
-import { AllRelationType } from 'form-relation/types/common'
+import { AllRelationType } from './types'
 import { useContext, useMemo } from 'react'
 import {
     FormDataContext,

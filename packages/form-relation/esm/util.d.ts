@@ -1,5 +1,5 @@
 import { NamePath } from 'antd/es/form/interface';
-import { AllRelationType, FormRelationDetailType, FormRelationOpParamType, FormRelationOpResType, FormRelationType, FormValidateType } from '../types/common';
+import { AllRelationType, FormRelationDetailType, FormRelationOpParamType, FormRelationOpResType, FormRelationType, FormValidateType } from './types';
 export declare const hasProp: (obj: Record<string, any>, key: any) => boolean;
 /**
  * 合并两个对象

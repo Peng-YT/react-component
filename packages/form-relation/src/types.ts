@@ -1,3 +1,5 @@
+import { RuleObject } from "antd/es/form"
+
 /*
  * @Author: 彭越腾
  * @Date: 2023-11-23 11:07:15
@@ -6,7 +8,7 @@
  * @FilePath: \react-component\packages\form-relation\types\common.d.ts
  * @Description: https://github.com/OBKoro1/koro1FileHeader/wiki/%E9%85%8D%E7%BD%AE
  */
-type DeepArrayType<A1, A2> = A1 | [...A1, ...A2]
+export type ArrayItemType<ArrayType> = ArrayType extends Array<infer T> ? T : any
 type KeyPath<Info = any> = string[]
 export type FormRelationControllerType<Info = any> =
     | {

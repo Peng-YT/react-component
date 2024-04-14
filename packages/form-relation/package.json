@@ -26,12 +26,14 @@
     },
     "files": [
         "esm",
-        "lib"
+        "lib",
+        "iife"
     ],
     "buildOpts": {
         "formats": [
             "esm",
-            "cjs"
+            "cjs",
+            "iife"
         ],
         "entries": [
             "index.tsx",
@@ -39,9 +41,9 @@
             "hook.tsx",
             "context.ts"
         ],
-        "varName": "FormRelation"
+        "varName": "FormRelation",
+        "mainEntry": "index.tsx"
     },
-    "type": "module",
     "publishConfig": {
         "registry": "https://registry.npmjs.org/",
         "access": "public"
@@ -61,5 +63,12 @@
         "react-use": ">=17.4.0"
     },
     "gitHead": "15c39af3e20b71612859dbea88639076d3da9c5f",
-    "types": "./lib/index.d.ts"
+    "types": "./lib/index.d.ts",
+    "devDependencies": {
+        "@commitlint/cli": "^19.2.1",
+        "@commitlint/config-conventional": "^19.1.0",
+        "husky": "^9.0.11",
+        "lint-staged": "^15.2.2",
+        "webpack-cli": "^5.1.4"
+    }
 }

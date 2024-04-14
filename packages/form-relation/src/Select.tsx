@@ -22,7 +22,7 @@ import {
 } from './context'
 import { cpmNamePath, getMatchRelationResByFormData, mergeRelation, optionIsDisabled, optionIsHide } from './util'
 import { isDisabled } from './util';
-import { AllRelationType } from 'form-relation/types/common'
+import { AllRelationType } from './types'
 
 function SelectComponent<VT extends SelectValue = SelectValue>({
     children,

@@ -12,7 +12,7 @@ import type { FormInstance, FormItemProps, FormProps } from 'antd'
 import { Form } from 'antd'
 import type { RuleObject } from 'antd/es/form'
 import type { NamePath } from 'antd/es/form/interface'
-import { FormRelationDetailType, FormRelationType, FormValidateType } from '../types/common'
+import { FormRelationDetailType, FormRelationType, FormValidateType } from './types'
 import { isEmpty, isEqual } from 'lodash'
 import React, {
     createContext,

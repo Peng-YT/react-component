@@ -6,7 +6,6 @@
   "homepage": "https://github.com/Peng-YT/react-component/tree/master/packages/resizable-table",
   "license": "ISC",
   "main": "lib/index.js",
-  "type": "module",
   "directories": {
     "lib": "lib"
   },

@@ -50,16 +50,17 @@ const getOpts = (format: ModuleFormat, outputDir: string): RollupOptions => {
             modules: true
         })
     ]
-    if(format === 'cjs' || format === 'commonjs') {
+    /* if(isBrowser) {
         plugins.push(require('@rollup/plugin-commonjs')({}))
         plugins.push(require('@rollup/plugin-node-resolve').nodeResolve())
-    }
+    } */
     return {
-        external: isBrowser ? undefined : external,
+        /* external: isBrowser ? undefined : external, */
         output: isBrowser ? {
             format,
             dir: outputDir,
             name: pkg.buildOpts.varName,
+            exports: "named"
         } : {
             entryFileNames: '[name].js',
             format,
@@ -68,11 +69,12 @@ const getOpts = (format: ModuleFormat, outputDir: string): RollupOptions => {
                     return 'vendor'
                 }
             }, */
-            dir: outputDir
+            dir: outputDir,
+            
         },
         treeshake: false,
         plugins,
-        input: entriesFileName.reduce((prev, cur) => {
+        input: isBrowser ? `./src/${pkg.buildOpts.mainEntry}` : entriesFileName.reduce((prev, cur) => {
             return {
                 ...prev,
                 [removeAfterfix(cur)]: `./src/${cur}`

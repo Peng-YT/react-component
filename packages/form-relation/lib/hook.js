@@ -2,7 +2,8 @@
 
 var React = require('react');
 var context = require('./context.js');
-var util = require('./util-942300a6.js');
+var util = require('./util.js');
+require('lodash');
 
 const useRelation = (props) => {
     const name = React.useContext(context.NameContext);

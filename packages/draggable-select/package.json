@@ -6,7 +6,6 @@
   "homepage": "https://github.com/Peng-YT/react-component#readme",
   "license": "ISC",
   "main": "lib/index.js",
-  "type": "module",
   "buildOpts": {
     "formats": [
       "esm"

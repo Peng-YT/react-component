@@ -1,6 +1,6 @@
 import type { FormInstance, FormItemProps, FormProps } from 'antd';
 import { Form } from 'antd';
-import { FormRelationType, FormValidateType } from '../types/common';
+import { FormRelationType, FormValidateType } from './types';
 import React from 'react';
 import Checkbox from './Checkbox';
 import Radio from './Radio';

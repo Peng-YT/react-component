@@ -30,12 +30,24 @@
     "rollup-plugin-postcss": ">=4.0.2",
     "rollup-plugin-typescript2": "^0.34.1",
     "standard-changelog": "^2.0.27",
+    "ts-loader": "^9.5.1",
     "ts-node": "^10.9.1"
   },
   "config": {
     "commitizen": {
       "path": "cz-conventional-changelog"
     }
+  },
+  "husky": {
+    "hooks": {
+      "commit-msg": "commitlint -E HUSKY_GIT_PARAMS"
+    }
+  },
+  "lint-staged": {
+    "*.{js,ts}": [
+      "./scripts/commitMsgCheck.js",
+      "git add"
+    ]
   },
   "engines": {
     "node": ">=16.0.0"

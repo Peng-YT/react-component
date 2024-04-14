@@ -1,6 +1,6 @@
 import { FormInstance } from "antd"
 import { NamePath } from "antd/es/form/interface"
-import { FormRelationType, FormValidateType } from "form-relation/types/common"
+import { FormRelationType, FormValidateType } from "./types"
 import { createContext } from "react"
 
 export const RelationInfoContext = createContext<FormRelationType[]>([])

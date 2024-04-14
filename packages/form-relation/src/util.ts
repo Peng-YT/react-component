@@ -1,6 +1,6 @@
 import { RuleObject } from 'antd/es/form'
 import { NamePath } from 'antd/es/form/interface'
-import { AllRelationType, FormRelationDetailType, FormRelationOpParamType, FormRelationOpResType, FormRelationType, FormValidateType } from '../types/common'
+import { AllRelationType, FormRelationDetailType, FormRelationOpParamType, FormRelationOpResType, FormRelationType, FormValidateType } from './types'
 import { isPlainObject } from 'lodash'
 export const hasProp = (obj: Record<string, any>, key) => {
     if (Array.isArray(key)) {

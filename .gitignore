@@ -3,3 +3,10 @@ node_modules
 lerna-debug.log
 */**/node_modules
 test.tsx
+
+esm
+lib
+umd
+iife
+cjs
+dist
