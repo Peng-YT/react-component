@@ -10,6 +10,7 @@ import fs from "fs";
 import { fileURLToPath } from "url";
 import { resolve, dirname } from "path";
 import cp from "child_process";
+import { runParallel } from "../utils";
 
 const __dirname = fileURLToPath(new URL(".", import.meta.url));
 // console.log(import.meta.url, new URL(".", import.meta.url), fileURLToPath(import.meta.url), dirname(fileURLToPath(import.meta.url)))
@@ -51,7 +52,7 @@ pkgs.map((pkg) => {
         },
         (error, stdout, stderr) => {
             const info = stderr || stdout
-            if(!info) {
+            if (!info) {
                 return
             }
             console.error(`Build info:`);
